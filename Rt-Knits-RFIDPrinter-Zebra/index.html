@@ -1,0 +1,189 @@
+<html data-theme="business">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <head>
+    <script
+      type="text/javascript"
+      src="./PrinterSDK/BrowserPrint-3.1.250.min.js"
+    ></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script type="text/javascript">
+      var selected_device;
+      var devices = [];
+      function setup() {
+        setupDeviceSelection();
+
+        document
+          .getElementById("rfidForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            // get the value of the input field
+            var sampleId = document.getElementById("sampleId").value;
+            writeToSelectedPrinter(toZPL(sampleId));
+          })
+          .addEventListener("keyup");
+
+        // Execute a function when the user releases a key on the keyboard
+        window.addEventListener("keyup", function (event) {
+          // Number 13 is the "Enter" key on the keyboard
+          if (event.key === "Enter") {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            document.getElementById("submitBtn").click();
+          }
+        });
+      }
+
+      function setupDeviceSelection() {
+        //Get the default device from the application as a first step. Discovery takes longer to complete.
+        BrowserPrint.getDefaultDevice(
+          "printer",
+          function (device) {
+            //Add device to list of devices and to html select element
+            selected_device = device;
+            devices.push(device);
+            var html_select = document.getElementById("selected_device");
+            var option = document.createElement("option");
+            option.text = device.name;
+            html_select.add(option);
+            //Discover any other devices available to the application
+            BrowserPrint.getLocalDevices(
+              function (device_list) {
+                for (var i = 0; i < device_list.length; i++) {
+                  //Add device to list of devices and to html select element
+                  var device = device_list[i];
+                  if (!selected_device || device.uid != selected_device.uid) {
+                    devices.push(device);
+                    var option = document.createElement("option");
+                    option.text = device.name;
+                    option.value = device.uid;
+                    html_select.add(option);
+                  }
+                }
+              },
+              function () {
+                alert("Error getting local devices");
+              },
+              "printer"
+            );
+          },
+          function (error) {
+            alert(error);
+          }
+        );
+      }
+
+      function writeToSelectedPrinter(dataToWrite) {
+        selected_device.send(
+          dataToWrite,
+          (r) => {
+            console.log({ r });
+          },
+          alert
+        );
+      }
+      function onDeviceSelected(selected) {
+        for (var i = 0; i < devices.length; ++i) {
+          if (selected.value == devices[i].uid) {
+            selected_device = devices[i];
+            return;
+          }
+        }
+      }
+
+      function toZPL(sampleid) {
+        // since the EPC data is in hex format, we must translate the sampleid into hex first!
+        const s = `
+        ^XA
+          ^RS8
+          ^RFW,H,,,A^FD${ascii_to_hexa(sampleid)}^FS
+          ^FO200,200^A0N,50,50^FD ${sampleid}
+        ^XZ`;
+        return s;
+      }
+
+      function ascii_to_hexa(str) {
+        var arr1 = [];
+        for (var n = 0, l = str.length; n < l; n++) {
+          var hex = Number(str.charCodeAt(n)).toString(16);
+          arr1.push(hex);
+        }
+        return arr1.join("");
+      }
+
+      window.onload = setup;
+    </script>
+  </head>
+  <body class="w-screen h-screen p-8 flex flex-col gap-16">
+    <header class="flex items-center gap-2">
+      <div class="flex gap-1 items-center">
+        <img src="./assets/logo-rtknits.png" class="w-32" alt="Logo" />
+        <h1 class="tracking-tighter text-xl mt-1">
+          Sample Garment RFID Printer
+        </h1>
+      </div>
+      <div class="grow"></div>
+
+      <a
+        href="https://github.com/Jeffersonlii/Rt-Knits-RFIDPrinter"
+        target="_blank"
+        class="btn btn-secondary"
+      >
+        Info
+      </a>
+      <select
+        id="selected_device"
+        class="select w-full max-w-xs select-primary"
+        onchange="onDeviceSelected(this);"
+      >
+        <option disabled selected>Select Printer</option>
+      </select>
+    </header>
+    <div class="flex flex-col justify-center max-w-xl self-center w-full">
+      <form
+        id="rfidForm"
+        class="flex justify-center items-center h-full w-full flex-col gap-4"
+      >
+        <label class="form-control w-full">
+          <div class="label">
+            <span class="label-text">Insert Sample Id of Garment</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Sample id"
+            class="input input-bordered w-full"
+            id="sampleId"
+          />
+        </label>
+
+        <button
+          id="submitBtn"
+          type="submit"
+          class="btn btn-primary btn-lg w-full"
+        >
+          Print RFID Label
+        </button>
+      </form>
+
+      <details class="collapse bg-base-200 w-full h-full">
+        <summary class="collapse-title text-md font-medium">
+          Troubleshooting
+        </summary>
+        <div class="collapse-content">
+          <ul class="">
+            <li><a>1. Make sure printer is connected</a></li>
+            <li><a>2. Make sure printer is unpaused</a></li>
+            <li><a>3. Make sure printer has material</a></li>
+            <li><a>4. Calibrate the media and RFID of the printer</a></li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </body>
+</html>

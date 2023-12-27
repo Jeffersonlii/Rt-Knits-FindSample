@@ -2,6 +2,9 @@
 
 Simple Webapp to print RFID Labels based on the SampleId
 
+# Media 
+![image](https://github.com/Jeffersonlii/Rt-Knits-FindSample/assets/32963293/54881243-e29d-4710-9b84-e9be636d9ba3)
+
 # Functionality
 
 - User is prompted the success/failure of printer connection

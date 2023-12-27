@@ -1,0 +1,100 @@
+<html data-theme="corporate">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.4.20/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript">
+      function setup() {
+        document
+          .getElementById("rfidForm")
+          .addEventListener("submit", function (event) {
+            event.preventDefault();
+            var sampleId = document.getElementById("sampleId").value;
+
+            fetch(`print/${sampleId}`, {
+              method: "post",
+            });
+          });
+      }
+      window.onload = setup;
+    </script>
+  </head>
+  <body class="w-screen h-screen p-8 flex flex-col">
+    <header class="flex items-center gap-2">
+      <div class="flex gap-1 items-center">
+        <img
+          src="{{url_for('static', filename='assets/logo-rtknits.png')}}"
+          class="w-32"
+          alt="Logo"
+        />
+        <h1 class="tracking-tighter text-xl mt-2">
+          Sample Garment RFID Printer
+        </h1>
+      </div>
+      <div class="grow"></div>
+      <a
+        href="https://github.com/Jeffersonlii/Rt-Knits-RFIDPrinter"
+        target="_blank"
+        class="btn btn-secondary"
+      >
+        Info
+      </a>
+    </header>
+    <section class="w-full h-full flex justify-center items-center">
+      <div class="flex flex-col justify-center max-w-xl self-center w-full gap-4">
+        <form
+          id="rfidForm"
+          class="flex justify-center items-center h-full w-full flex-col gap-4 m-0"
+        >
+          <label class="form-control w-full">
+            <div class="label">
+              <span class="label-text">Insert Sample Id of Garment</span>
+            </div>
+            <input
+              type="text"
+              placeholder="Sample id"
+              class="input input-bordered w-full"
+              id="sampleId"
+            />
+          </label>
+
+          <button
+            id="submitBtn"
+            type="submit"
+            class="btn btn-primary btn-lg w-full"
+          >
+            Print RFID Label
+          </button>
+        </form>
+
+        <section class="w-full">
+          {% if err != None %}
+            <div class="text-error font-bold">{{err}}</div>
+          {% else %} 
+          <div class="text-success">
+            Printer Connected!
+          </div>
+          {% endif %}
+        </section>
+
+        <details class="collapse bg-base-200 w-full h-full">
+          <summary class="collapse-title text-md font-medium">
+            Troubleshooting
+          </summary>
+          <div class="collapse-content">
+            <ul class="">
+              <li><a>1. Make sure printer is connected</a></li>
+              <li><a>3. Make sure printer has material</a></li>
+              <li><a>4. Calibrate the media and RFID of the printer</a></li>
+              <li><a>4. Restart Flask App</a></li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+  </body>
+</html>

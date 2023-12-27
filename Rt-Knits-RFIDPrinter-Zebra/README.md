@@ -1,4 +1,4 @@
-# Rt-Knits-RFIDPrinter
+# Rt-Knits-RFIDPrinter-Zebra
 
 Simple Webapp to print RFID Labels based on the SampleId
 

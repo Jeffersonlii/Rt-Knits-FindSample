@@ -6,6 +6,9 @@ def ascii_to_hex(text):
 def err_msg(func: str, err: str):
     return f"Printer SDK {func} Failed : Error Code {err}. Refer to Docs for more detail"
 
+# This service is the facade to interact with the printer
+# Refer to https://www.servopack.de/support/zebra/ZPLII-Prog.pdf for ZPL commands
+# This module uses the ctypes library to interop with the SDK, which is a DLL in C
 class PrinterService():
     
     __printer_handle = ctypes.c_void_p()

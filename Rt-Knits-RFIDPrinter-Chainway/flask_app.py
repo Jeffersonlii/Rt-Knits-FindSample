@@ -13,7 +13,6 @@ def print_label(sampleid: str):
     ps.print(sampleid)
     print(f"Sample ID: {sampleid}")
     return sampleid
-    # return jsonify({"message": "Data received"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

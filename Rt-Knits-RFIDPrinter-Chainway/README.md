@@ -2,7 +2,8 @@
 
 Simple Webapp to print RFID Labels based on the SampleId
 
-# Media 
+# Media
+
 ![image](https://github.com/Jeffersonlii/Rt-Knits-FindSample/assets/32963293/54881243-e29d-4710-9b84-e9be636d9ba3)
 
 # Functionality
@@ -64,3 +65,4 @@ Since this is a lightweight app meant to be used on prem, we can simply run the 
 - RFID's memory can only hold hexadecimal values. Therefore the written RFID is actually the hexidecial conversion of the sample id. (Any application consuming the RFID must convert it to ASCII to get the SampleID!)
 - RFID's memory size depends on the chip but it is minimum 96-bits (12 ASCII Characters or 24 HEX Characters). Therefore wrtting more than that will result in VOIDs printed to the label. SampleIDs at RTKnits nicely fall below this character limit.
 - The printer should be fully calibrated before using this application
+- SampleIDs are case insensitive, therefor sampleIDs are converted to lowercase before processessing

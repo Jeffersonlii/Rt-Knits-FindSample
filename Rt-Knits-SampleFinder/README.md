@@ -25,10 +25,10 @@ This Android application allows users to utilize the RFID scanner on their devic
 4. The app will display the RFID location signal in real-time on the screen.
 
 # Media
+
 <img src="https://github.com/Jeffersonlii/Rt-Knits-SampleFinder/assets/32963293/2a593336-7adc-4cd7-af3c-301a9563be5a" width="300">
 
 [Screen_recording_20231221_172502.webm](https://github.com/Jeffersonlii/Rt-Knits-SampleFinder/assets/32963293/a7a573ce-b619-4d2c-b543-4d9fec6e1380)
-
 
 # Contact
 
@@ -39,3 +39,4 @@ If you have any questions or suggestions, feel free to contact the me at ( jeffe
 - This application is not connected to FileMaker. The RFID is simply the SampleID translated to hexadecimal
 - The RFID tags on the sample should be printed via the [printer webapp](https://github.com/Jeffersonlii/Rt-Knits-RFIDPrinter)
   - [printer webapp](https://github.com/Jeffersonlii/Rt-Knits-RFIDPrinter) writes the RFID as the hex value of the sampleID during printing
+- SampleIDs are case insensitive, therefor the application searches for the `lowercase` of the sampleID. It is assumed that the printer writes the lowercase sampleID onto the RFID labels

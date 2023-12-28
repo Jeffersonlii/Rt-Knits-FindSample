@@ -58,3 +58,4 @@ Please remember to also have the **printer drivers** and **BrowserPrint Service*
 - RFID's memory can only hold hexadecimal values. Therefore the written RFID is actually the hexidecial conversion of the sample id. (Any application consuming the RFID must convert it to ASCII to get the SampleID!)
 - RFID's memory size depends on the chip but it is minimum 96-bits (12 ASCII Characters or 24 HEX Characters). Therefore wrtting more than that will result in VOIDs printed to the label. SampleIDs at RTKnits nicely fall below this character limit.
 - The printer should be fully calibrated before using this application
+- SampleIDs are case insensitive, therefor sampleIDs are converted to lowercase before processessing

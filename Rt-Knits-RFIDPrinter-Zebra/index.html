@@ -102,7 +102,7 @@
         const s = `
         ^XA
           ^RS8
-          ^RFW,H,,,A^FD${ascii_to_hexa(sampleid)}^FS
+          ^RFW,H,,,A^FD${ascii_to_hexa(sampleid.toLowerCase())}^FS
           ^FO200,200^A0N,50,50^FD ${sampleid}
         ^XZ`;
         return s;

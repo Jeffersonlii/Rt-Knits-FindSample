@@ -12,7 +12,7 @@ def err_msg(func: str, err: str):
 class PrinterService():
     
     __printer_handle = ctypes.c_void_p()
-    __dll = ctypes.cdll.LoadLibrary(r"./sdk/ZPL_SDK_x64.dll")
+    __dll = ctypes.cdll.LoadLibrary(r"./static/chainwaySDK/ZPL_SDK_x64.dll")
     __isConnected = False
   
     def initialize(self):

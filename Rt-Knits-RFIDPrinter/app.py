@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request
-from print_service import PrinterService
-ps = PrinterService()
-ps_err = ps.initialize()
+from endpoints.chainway import chainwayApp
+from endpoints.zebra import zebraApp
+
 app = Flask(__name__)
+app.register_blueprint(chainwayApp, url_prefix='/chainway')
+app.register_blueprint(zebraApp, url_prefix='/zebra')
 
 @app.route('/')
 def home():
-    return render_template('index.html', err = ps_err)
+    return render_template('choose.html')
 
 @app.route('/print/<sampleid>', methods=['POST'])
 def print_label(sampleid: str):

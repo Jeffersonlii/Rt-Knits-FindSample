@@ -1,4 +1,4 @@
-# Rt-Knits-RFIDPrinter-Chainway
+# Rt-Knits-RFIDPrinter
 
 Simple Webapp to print RFID Labels based on the SampleId
 
@@ -8,6 +8,7 @@ Simple Webapp to print RFID Labels based on the SampleId
 
 # Functionality
 
+- User can choose to print from Zebra or Chainway Printer
 - User is prompted the success/failure of printer connection
 - User can input a sample id into the website
 - A RFID Label is then printed from the connected printer, with the RFID overridden as the input Sample ID
@@ -17,9 +18,9 @@ Simple Webapp to print RFID Labels based on the SampleId
 
 This webapp is a Python Flask webapp.
 
-Python is used to interface with the Chainway ZPL SDK.
+Python is used to interface with the Chainway ZPL SDK or Zebra BrowserPrint SDK.
 
-Flask is used to spin up a simple webserver serving `index.html`.
+Flask is used to spin up a simple webserver serving `html`.
 
 ## Styles
 
@@ -29,20 +30,33 @@ Their imports are found in the `head` tag
 
 ## SDKs
 
-Chainway ZPL SDKs are utilized to interface with the Chainway Printer. The SDK is found under `/sdk`
+- Chainway ZPL SDKs are utilized to interface with the Chainway Printer. The SDK is found under `/static/chainwaySDK`
+
+- Zebra BrowserPrint SDKs are utilized to interface with the Zebra Printer. The SDKs are found under `/static/zebraSDK`
 
 # Compatibility
 
-This application is written to be used with the printer **Chainway CP30** in mind.
+This application is compatible with the printers **Chainway CP30** and **Zebra ZD612R**
 
-# Exterior Requirements
+# Exterior Requirements - Chainway
 
 1. Please download and install the [Drivers](https://www.chainway.net/Support/Info/30) of the printer
+
+# Exterior Requirements - Zebra
+
+1. The Printer SDK works by talking to the [BrowserPrint Service](https://www.zebra.com/us/en/support-downloads/printer-software/by-request-software.html).
+
+   This service runs on OS startup and exposes an http endpoint (`localhost:9100`) for the SDK to interop.
+   <sub>Make sure the port `9100` is unoccupied!</sub>
+
+2. The Service also needs the [Drivers](https://www.zebra.com/us/en/support-downloads/printers/desktop/zd621.html) of the printer.
+
+**Both of these software must be installed and running for the ZEBRA PrinterSDK to work!**
 
 # App Requirements
 
 ```
-cd \Rt-Knits-RFIDPrinter-Chainway
+cd \Rt-Knits-RFIDPrinter
 .venv\Scripts\activate
 ```
 
@@ -58,7 +72,7 @@ Install the dependencies
 
 Since this is a lightweight app meant to be used on prem, we can simply run the dev server instead of setting up complicated prod environments.
 
-`flask --app flask_app run`
+`python -m flask run`
 
 # Misc Knowledge
 

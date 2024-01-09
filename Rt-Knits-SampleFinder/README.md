@@ -3,6 +3,9 @@
 This Android application allows users to utilize the RFID scanner on their devices to scan for the location of RFID tag. This app is made to be ran on a [ Chainway C5 UHF RFID Reader](https://www.chainway.net/Products/Info/142) OR
 [Sunmi UHF Reader](https://www.sunmi.com/en-US/l2k/)
 
+# Download
+The App can be downloaded by using the APK provided in this repository (`app.apk`)
+
 # Features
 
 - SampleID input : The user is able to input the desired SampleID to locate.

@@ -72,7 +72,7 @@ Install the dependencies
 
 Since this is a lightweight app meant to be used on prem, we can simply run the dev server instead of setting up complicated prod environments.
 
-`python -m flask run`
+`python app.py`
 
 # Misc Knowledge
 

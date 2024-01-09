@@ -11,6 +11,6 @@ def home():
 
 @chainwayApp.route('/print/<sampleid>', methods=['POST'])
 def print_label(sampleid: str):
-    ps.print(sampleid)
+    ps.printLabel(sampleid)
     print(f"Sample ID: {sampleid}")
     return sampleid

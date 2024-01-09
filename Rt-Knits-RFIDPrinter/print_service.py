@@ -4,7 +4,7 @@ def ascii_to_hex(text):
     return text.encode('utf-8').hex()
     
 def err_msg(func: str, err: str):
-    return f"Printer SDK {func} Failed : Error Code {err}. Refer to Docs for more detail"
+    return f"Chainway Printer SDK {func} Failed : Error Code {err}. Refer to Docs for more detail"
 
 # This service is the facade to interact with the printer
 # Refer to https://www.servopack.de/support/zebra/ZPLII-Prog.pdf for ZPL commands
@@ -39,25 +39,16 @@ class PrinterService():
         # Call PrinterDestroy function to release the resource of the printer object
         self.__dll.PrinterDestroy(self.__printer_handle)
 
-    def print(self, sampleid: str):
+    def printLabel(self, sampleid: str, repeat = 1):
         if(not self.isConnected()):
             return "Printer not Connected"
-
-        # Set the after print action to be 'Cutting'
-        # We want the printer to auto cut off the printed label
-        zpl_set_cutter = """
-        ^XA
-            ^MMC
-            ^PQ1,1,0,Y
-            ^JUS
-        ^XZ"""
-        ret = self.__dll.WriteData(self.__printer_handle, zpl_set_cutter.encode(), len(zpl_set_cutter))
-
         # the ZPL to send to the printer, encoded in bytes
         # notice we also change the underlying RFID EPC of the hex of the sampleid
         # this is so that we can locate the label with a scanner!
         zpl = f"""
         ^XA
+            ^MMC
+            ^PQ{repeat},{repeat},0,Y
             ^RS8
             ^RFW,H,,,A^FD{ascii_to_hex(sampleid.lower())}^FS
             ^FO200,200^A0N,50,50^FD {sampleid}

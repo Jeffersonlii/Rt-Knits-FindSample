@@ -26,9 +26,9 @@ This Android application allows users to utilize the RFID scanner on their devic
 
 # Media
 
-<img src="https://github.com/Jeffersonlii/Rt-Knits-SampleFinder/assets/32963293/2a593336-7adc-4cd7-af3c-301a9563be5a" width="300">
+<img src="https://github.com/Jeffersonlii/Rt-Knits-FindSample/assets/32963293/cd59abee-5e71-497f-8fe5-08f7d9bbbb5f width="300">
 
-[Screen_recording_20231221_172502.webm](https://github.com/Jeffersonlii/Rt-Knits-SampleFinder/assets/32963293/a7a573ce-b619-4d2c-b543-4d9fec6e1380)
+[Screen_recording_20231221_172502.webm](https://github.com/Jeffersonlii/Rt-Knits-FindSample/assets/32963293/ae9e3f55-08c0-474c-9f08-b8ee3389939a)
 
 # Contact
 

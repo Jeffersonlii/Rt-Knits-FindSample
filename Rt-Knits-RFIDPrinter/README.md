@@ -93,3 +93,5 @@ Since this is a lightweight app meant to be used on prem, we can simply run the 
 
 - This service can be ran on windows startup by putting `run_printer_service.bat` in
   `C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup`
+
+https://ctxt.io/2/AAAwov7lFg

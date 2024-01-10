@@ -13,18 +13,37 @@ app.register_blueprint(zebraApp, url_prefix='/zebra')
 def home():
     return render_template('choose.html')
 
+# this endpoint tries to print to any RFID printer it can find, 
+# meant to be used in a FileMaker App
+# FileMaker can then use the "Insert from URL" function to call this endpoint
+# and directly print without using our UI
+# ex. 
+#   Set Variable [ $url ; Value: "http://127.0.0.1:8003/FMprint/mySampleId?copies=2" ]
+#   Insert from URL [ Select ; With dialog: Off ; $result ; $url ; cURL options: "-X POST" ]
 @app.route('/FMprint/<sampleid>', methods=['POST'])
 def print_label(sampleid: str):
-    repeat = request.args.get('repeat', default = 1, type = int)
+    copies = request.args.get('copies', default = 1, type = int)
 
     # try chainway printer
-    ps.printLabel(sampleid, repeat=repeat)
+    ps.printLabel(sampleid, copies=copies)
 
     # try zebra printer
     render_template('zebra_print_service.html',
                            sampleID = sampleid,
-                           repeat = repeat)
+                           copies = copies)
     return sampleid
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8003)
+    print(
+    """
+            RFID Printer Service
+    ----------------------------------
+    This service exposes an endpoint for the Filemaker App 'Printer Sample Sticker' under 'Sample Room SAM'.
+    It runs on localhost:8003 and should run on startup.
+
+    Docs : https://github.com/Jeffersonlii/Rt-Knits-FindSample/tree/main/Rt-Knits-RFIDPrinter
+    ----------------------------------
+    """)
+    app.run(port=8003)
+
+ 

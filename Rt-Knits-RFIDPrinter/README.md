@@ -38,6 +38,8 @@ Their imports are found in the `head` tag
 
 This application is compatible with the printers **Chainway CP30** and **Zebra ZD612R**
 
+This application is meant to be ran on **windows**
+
 # Exterior Requirements - Chainway
 
 1. Please download and install the [Drivers](https://www.chainway.net/Support/Info/30) of the printer
@@ -80,3 +82,14 @@ Since this is a lightweight app meant to be used on prem, we can simply run the 
 - RFID's memory size depends on the chip but it is minimum 96-bits (12 ASCII Characters or 24 HEX Characters). Therefore wrtting more than that will result in VOIDs printed to the label. SampleIDs at RTKnits nicely fall below this character limit.
 - The printer should be fully calibrated before using this application
 - SampleIDs are case insensitive, therefor sampleIDs are converted to lowercase before processessing
+
+# PRINT SERVICE FOR FILEMAKER
+
+- this application also exposes the endpoint
+
+  `POST http://127.0.0.1:8003/FMprint/<sampleid>?copies=<copies>`
+
+- Filemaker (or anything) can print an RFID label by calling this endpoint. (Note the POST method)
+
+- This service can be ran on windows startup by putting `run_printer_service.bat` in
+  `C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup`

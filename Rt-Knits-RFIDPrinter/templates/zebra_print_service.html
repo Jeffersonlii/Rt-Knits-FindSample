@@ -1,4 +1,5 @@
-<html data-theme="corporate">
+<!-- This JS file is to be used by flask to send print requests to zebra printers -->
+<html>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <head>
     <script
@@ -12,7 +13,7 @@
           function (device) {
             selected_device = device;
 
-            writeToSelectedPrinter(toZPL("{{ sampleID }}", "{{ repeat }}"));
+            writeToSelectedPrinter(toZPL("{{ sampleID }}", "{{ copies }}"));
           },
           function (error) {
             alert(error);
@@ -30,12 +31,12 @@
         );
       }
 
-      function toZPL(sampleid, repeat) {
+      function toZPL(sampleid, copies) {
         // since the EPC data is in hex format, we must translate the sampleid into hex first!
         const s = `
         ^XA
           ^MMC
-          ^PQ${repeat},${repeat},0,Y
+          ^PQ${copies},${copies},0,Y
           ^RS8
           ^RFW,H,,,A^FD${ascii_to_hexa(sampleid.toLowerCase())}^FS
           ^FO200,200^A0N,50,50^FD ${sampleid}

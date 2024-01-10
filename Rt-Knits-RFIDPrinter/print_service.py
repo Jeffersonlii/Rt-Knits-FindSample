@@ -39,7 +39,7 @@ class PrinterService():
         # Call PrinterDestroy function to release the resource of the printer object
         self.__dll.PrinterDestroy(self.__printer_handle)
 
-    def printLabel(self, sampleid: str, repeat = 1):
+    def printLabel(self, sampleid: str, copies = 1):
         if(not self.isConnected()):
             return "Printer not Connected"
         # the ZPL to send to the printer, encoded in bytes
@@ -48,7 +48,7 @@ class PrinterService():
         zpl = f"""
         ^XA
             ^MMC
-            ^PQ{repeat},{repeat},0,Y
+            ^PQ{copies},{copies},0,Y
             ^RS8
             ^RFW,H,,,A^FD{ascii_to_hex(sampleid.lower())}^FS
             ^FO200,200^A0N,50,50^FD {sampleid}

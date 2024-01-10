@@ -58,7 +58,7 @@ This application is meant to be ran on **windows**
 # App Requirements
 
 ```
-cd \Rt-Knits-RFIDPrinter
+cd \Rt-Knits-RFIDPrinter\app
 .venv\Scripts\activate
 ```
 
@@ -74,7 +74,7 @@ Install the dependencies
 
 Since this is a lightweight app meant to be used on prem, we can simply run the dev server instead of setting up complicated prod environments.
 
-`python app.py`
+`pythonw app.pyw`
 
 # Misc Knowledge
 

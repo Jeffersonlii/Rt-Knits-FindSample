@@ -19,7 +19,7 @@ def home():
 # and directly print without using our UI
 # ex. 
 #   Set Variable [ $url ; Value: "http://127.0.0.1:8003/FMprint/mySampleId?copies=2" ]
-#   Insert from URL [ Select ; With dialog: Off ; $result ; $url ; cURL options: "-X POST" ]
+#   Insert from URL [ Select ; With dialog: Off ; Target:$_ ; $result ; $url ; cURL options: "-X POST" ]
 @app.route('/FMprint/<sampleid>', methods=['POST'])
 def print_label(sampleid: str):
     copies = request.args.get('copies', default = 1, type = int)

@@ -1,5 +1,5 @@
 import ctypes
-
+import os.path
 def ascii_to_hex(text):
     return text.encode('utf-8').hex()
     
@@ -12,7 +12,9 @@ def err_msg(func: str, err: str):
 class PrinterService():
     
     __printer_handle = ctypes.c_void_p()
-    __dll = ctypes.cdll.LoadLibrary(r"./static/chainwaySDK/ZPL_SDK_x64.dll")
+    __dll = ctypes.cdll.LoadLibrary(
+        os.path.dirname(os.path.abspath(__file__)) + os.path.sep +
+        r"static/chainwaySDK/ZPL_SDK_x64.dll")
     __isConnected = False
   
     def initialize(self):
@@ -44,7 +46,7 @@ class PrinterService():
             return "Printer not Connected"
         # the ZPL to send to the printer, encoded in bytes
         # notice we also change the underlying RFID EPC of the hex of the sampleid
-        # this is so that we can locate the label with a scanner!
+        # this is how the rfid is linked to the sample!
         zpl = f"""
         ^XA
             ^MMC

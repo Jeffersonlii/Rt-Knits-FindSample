@@ -1,9 +1,4 @@
 @echo off
-cls
 
-:top
-echo.
-echo Starting RFID Printer Server...
-echo.
-
-python app.py
+echo RFID Printer Service Started, Please Close This Window
+pythonw app\app.pyw

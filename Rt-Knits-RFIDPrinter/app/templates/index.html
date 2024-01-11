@@ -9,6 +9,9 @@
             event.preventDefault();
             var sampleId = document.getElementById("sampleId").value;
             var qty = document.getElementById("quantity").value;
+            qty = qty === "" ? 1 : qty;
+            console.log(qty);
+
             fetch(`RFIDprint/${sampleId}?copies=${qty}`, {
               method: "post",
             })

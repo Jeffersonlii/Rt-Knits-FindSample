@@ -37,13 +37,23 @@ def zebra():
 def print_label(sampleid: str):
     copies = request.args.get('copies', default = 1, type = int)
 
+    # validate input
+    try:
+        if(not int(copies) > 0):
+            copies = 1
+    except:
+        copies = 1
+
     global ps_err
     global ps
     if(ps_err):
         # try to init again 
         ps_err = ps.initialize()
 
-    err = ps.printLabel(sampleid, copies=copies)
+    print(sampleid)
+    print(copies)
+    err = True
+    # err = ps.printLabel(sampleid, copies=copies)
     respObj = {
         "chainway_status" : "fail" if ps_err or err else "success",
         "chainway_error_code" : f'{ps_err} \n {err}'

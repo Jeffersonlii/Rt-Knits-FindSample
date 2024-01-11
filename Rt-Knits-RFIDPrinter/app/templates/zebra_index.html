@@ -87,21 +87,10 @@
             // get the value of the input field
             var sampleId = document.getElementById("sampleId").value;
             var qty = document.getElementById("quantity").value;
-
+            qty = qty === "" ? 1 : qty;
             writeToSelectedPrinter(toZPL(sampleId, qty));
           })
           .addEventListener("keyup");
-
-        // Execute a function when the user releases a key on the keyboard
-        window.addEventListener("keyup", function (event) {
-          // Number 13 is the "Enter" key on the keyboard
-          if (event.key === "Enter") {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Trigger the button element with a click
-            document.getElementById("submitBtn").click();
-          }
-        });
       }
 
       function setupDeviceSelection() {
@@ -165,7 +154,6 @@
         // since the EPC data is in hex format, we must translate the sampleid into hex first!
         const s = `
         ^XA
-          ^MMC
           ^PQ${copies},${copies},0,Y
           ^RS8
           ^RFW,H,,,A^FD${ascii_to_hexa(sampleid.toLowerCase())}^FS

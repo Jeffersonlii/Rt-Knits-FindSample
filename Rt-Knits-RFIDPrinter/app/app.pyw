@@ -1,3 +1,4 @@
+import subprocess
 from flask import Flask, render_template, request
 from endpoints.chainway import chainwayApp
 from endpoints.zebra import zebraApp
@@ -44,16 +45,13 @@ def print_label(sampleid: str):
     return sampleid
 
 if __name__ == '__main__':
-
-
-
     if getattr(sys, 'frozen', False):
         cms = ' && '.join([
             "echo RFID Printer Service Started, check http://127.0.0.1:8003 to confirm",
             "echo Docs : https://github.com/Jeffersonlii/Rt-Knits-FindSample/tree/main/Rt-Knits-RFIDPrinter",
             "echo You may stop/kill this service by running kill_printer_service.bat"
         ])
-        os.system(f'start /wait cmd /k "{cms}"')
+        subprocess.Popen(f'cmd /k "{cms}"', creationflags=subprocess.CREATE_NEW_CONSOLE)
     else:
         welcome = """
                 RFID Printer Service

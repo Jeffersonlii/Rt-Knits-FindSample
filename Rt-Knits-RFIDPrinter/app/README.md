@@ -67,3 +67,5 @@ use `run_printer_service.bat` to spin up the flask server
 # Building the app
 
 use `build_app.bat` to build the flask app into an executable that can be deployed
+
+**always build the app before a git commit so the github page has the most up to date download!**

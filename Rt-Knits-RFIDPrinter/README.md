@@ -4,9 +4,14 @@ This python flask app allows for print of RFID Labels for Samples at RT Knits
 
 ![image](https://github.com/Jeffersonlii/Rt-Knits-FindSample/assets/32963293/54881243-e29d-4710-9b84-e9be636d9ba3)
 
-# Download
+# Installation
 
-The app is available in `RFIDPrinter.tar.gz`
+1. Download application `RFIDPrinter.tar.gz`
+1. Install `python3`
+1. run service by executing `RFIDPrinterService.exe`
+1. Configure the service to run on startup
+   1. Create shortcut for `RFIDPrinterService.exe`
+   1. put shortcut in `C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup`
 
 # Compatibility
 

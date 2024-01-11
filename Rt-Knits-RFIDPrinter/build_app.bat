@@ -21,6 +21,7 @@ xcopy /E /I ..\app\static dist\static
 xcopy /E /I ..\app\templates dist\templates
 xcopy ..\kill_printer_service.bat dist\
 xcopy ..\README.md dist\
+xcopy ..\README.md dist\static\assets
 
 
 @REM zip it up!

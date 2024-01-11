@@ -49,7 +49,7 @@ fun Base() {
 
     LaunchedEffect(Unit) {
         // delay 1 second for Sunmi to connect
-        delay(1000)
+//        delay(1000)
         try {
             scannerService = ScannerChooser().getAttachedScanner()
         } catch (e: NoScannerDetected) {

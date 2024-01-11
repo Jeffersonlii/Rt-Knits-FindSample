@@ -5,7 +5,7 @@ package com.rtknits.rt_knits_samplefinder.scanners
 class ScannerChooser {
     private val scanners =arrayOf<ScannerService>(
         ChainwayScannerServiceImpl(),
-        SunmiScannerServiceImpl()
+//        SunmiScannerServiceImpl() //Sunmi sucks, dont support it anymore
     )
     fun getAttachedScanner(): ScannerService{
         for (scanner in scanners) {

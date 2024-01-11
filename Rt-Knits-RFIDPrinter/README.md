@@ -43,8 +43,8 @@ This app is a flask service that services a easy to use web interface, as well a
 
 ### Printing API
 
-- Available at http://127.0.0.1:8003/FMprint/{SAMPLEID}?copies={COPIES}
-- External Apps (ex. Filemaker) can use this endpoint to print RFID Labels
+- Available at http://127.0.0.1:8003/RFIDprint/{SAMPLEID}?copies={COPIES}
+- External Apps (ex. Filemaker) can use this endpoint to print RFID Labels on the chainway Printer
 
 **For development information, view `app/README.md`**
 

@@ -20,6 +20,8 @@ python -m PyInstaller ..\app\app.pyw --onefile --name=RFIDPrinterService
 xcopy /E /I ..\app\static dist\static
 xcopy /E /I ..\app\templates dist\templates
 xcopy ..\kill_printer_service.bat dist\
+xcopy ..\README.md dist\
+
 
 @REM zip it up!
 tar.exe -czvf ../RFIDPrinter.tar.gz ./dist

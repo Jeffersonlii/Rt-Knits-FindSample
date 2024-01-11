@@ -70,7 +70,7 @@ class PrinterService():
         if(not ret == 0):
             print(err_msg("WriteData",ret))
             return err_msg("WriteData",ret)
-        return True
+        return None
     
     def isConnected(self):
         return self.__isConnected

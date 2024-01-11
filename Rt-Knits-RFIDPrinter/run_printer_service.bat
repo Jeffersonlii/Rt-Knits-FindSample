@@ -1,4 +1,8 @@
+@REM --------------- run_printer_service.bat ---------------
+@REM this script runs the app as a python flask app (instead of as an EXE)
+@REM this is useful for debugging
+
 @echo off
 
-echo RFID Printer Service Started, Please Close This Window
-pythonw app\app.pyw
+python app\app.pyw
+

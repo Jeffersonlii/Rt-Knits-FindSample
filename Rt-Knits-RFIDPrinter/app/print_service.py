@@ -1,5 +1,16 @@
 import ctypes
 import os.path
+import sys, os
+
+if getattr(sys, 'frozen', False):
+    # if this app is ran as a executable (compiled by pyinstaller)
+    exe_path = os.path.dirname(sys.executable)
+else:
+    # if this app is ran on command line (python app.py)
+    exe_path = os.path.dirname(os.path.abspath(__file__))
+
+dll_path = os.path.join(exe_path, "static", "chainwaySDK", "ZPL_SDK_x64.dll")
+
 def ascii_to_hex(text):
     return text.encode('utf-8').hex()
     
@@ -12,9 +23,7 @@ def err_msg(func: str, err: str):
 class PrinterService():
     
     __printer_handle = ctypes.c_void_p()
-    __dll = ctypes.cdll.LoadLibrary(
-        os.path.dirname(os.path.abspath(__file__)) + os.path.sep +
-        r"static/chainwaySDK/ZPL_SDK_x64.dll")
+    __dll = ctypes.cdll.LoadLibrary(dll_path)
     __isConnected = False
   
     def initialize(self):

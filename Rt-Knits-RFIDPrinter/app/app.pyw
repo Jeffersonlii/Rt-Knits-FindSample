@@ -2,9 +2,9 @@ import subprocess
 from flask import Flask, jsonify, render_template, request
 from print_service import PrinterService
 import sys, os
-
 ps = PrinterService()
 ps_err = ps.initialize()
+print(ps_err)
 
 if getattr(sys, 'frozen', False):
     # if this app is ran as a executable (compiled by pyinstaller)
@@ -17,6 +17,7 @@ if getattr(sys, 'frozen', False):
 else:
     app = Flask(__name__)
 
+# ------------ ENDPOINTS -----------------
 
 @app.route('/')
 def home():
@@ -36,14 +37,21 @@ def zebra():
 def print_label(sampleid: str):
     copies = request.args.get('copies', default = 1, type = int)
 
+    global ps_err
+    global ps
+    if(ps_err):
+        # try to init again 
+        ps_err = ps.initialize()
+
     err = ps.printLabel(sampleid, copies=copies)
-    
     respObj = {
         "chainway_status" : "fail" if ps_err or err else "success",
         "chainway_error_code" : f'{ps_err} \n {err}'
     }
     return jsonify(respObj)
 
+
+# ------------ main -----------------
 if __name__ == '__main__':
     if getattr(sys, 'frozen', False):
         cms = ' && '.join([

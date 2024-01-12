@@ -23,6 +23,7 @@ else:
 def home():
     return render_template('index.html')
 @app.route('/zebra')
+@app.route('/zebra/')
 def zebra():
     return render_template('zebra_index.html')
 

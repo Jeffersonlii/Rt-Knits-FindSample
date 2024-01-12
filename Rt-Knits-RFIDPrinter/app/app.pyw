@@ -3,8 +3,6 @@ from flask import Flask, jsonify, render_template, request
 from print_service import PrinterService
 import sys, os
 ps = PrinterService()
-ps_err = ps.initialize()
-print(ps_err)
 
 if getattr(sys, 'frozen', False):
     # if this app is ran as a executable (compiled by pyinstaller)
@@ -47,9 +45,7 @@ def print_label(sampleid: str):
 
     global ps_err
     global ps
-    if(ps_err):
-        # try to init again 
-        ps_err = ps.initialize()
+    ps_err = ps.connect()
     err = ps.printLabel(sampleid, copies=copies)
     respObj = {
         "chainway_status" : "fail" if ps_err or err else "success",

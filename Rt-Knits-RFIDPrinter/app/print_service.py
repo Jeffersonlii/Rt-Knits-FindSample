@@ -26,7 +26,7 @@ class PrinterService():
     __dll = ctypes.cdll.LoadLibrary(dll_path)
     __isConnected = False
   
-    def initialize(self):
+    def connect(self):
         # Call PrinterCreator function to set up the target printer model
         ret = self.__dll.PrinterCreator(ctypes.byref(self.__printer_handle), b'HM-T300 PRO')
         if(not ret == 0):

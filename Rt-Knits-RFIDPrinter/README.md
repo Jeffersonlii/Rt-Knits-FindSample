@@ -36,7 +36,7 @@ This application is meant to be ran on **windows**
 
 # Functionality
 
-This app is a flask service that services a easy to use web interface, as well as an API
+This app is a flask service that serves a easy to use web interface, as well as an API
 
 ### Webapp
 
@@ -63,7 +63,7 @@ This application comes with 3 windows batch scripts to help with development
 - In production, the EXE should be ran on windows startup
 - This service can be ran on windows startup by putting `RFIDPrinterService.exe` in
   `C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup`
-
+ 
 **run_printer_service.bat**
 
 - Runs the app as a flask web service, appropriate for debugging

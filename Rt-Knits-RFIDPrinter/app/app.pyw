@@ -50,11 +50,7 @@ def print_label(sampleid: str):
     if(ps_err):
         # try to init again 
         ps_err = ps.initialize()
-
-    print(sampleid)
-    print(copies)
-    err = True
-    # err = ps.printLabel(sampleid, copies=copies)
+    err = ps.printLabel(sampleid, copies=copies)
     respObj = {
         "chainway_status" : "fail" if ps_err or err else "success",
         "chainway_error_code" : f'{ps_err} \n {err}'

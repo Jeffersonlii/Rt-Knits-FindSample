@@ -5,6 +5,8 @@ import java.util.function.IntConsumer
 
 interface ScannerService {
 
+//    fun connect()
+
     fun getScannerName(): String
     fun isConnected(): Boolean
     fun startLocateSingleRFID(context: Context, targetEPCHex: String, callback: IntConsumer): Boolean
@@ -14,5 +16,5 @@ interface ScannerService {
     fun registerRFIDtoLocate(targetEPCHex: String, callback: IntConsumer)
     fun stopLocateMultipleRFID()
 
-    fun cleanup()
+    fun disconnect()
 }

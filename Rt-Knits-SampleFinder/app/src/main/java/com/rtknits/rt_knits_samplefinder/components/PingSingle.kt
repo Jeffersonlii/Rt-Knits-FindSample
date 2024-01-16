@@ -70,7 +70,7 @@ fun PingSingle(sampleID: String, strength: Int) {
                     text = strengthToTip(strength),
                     style = MaterialTheme.typography.bodyLarge
                 )
-            if(strength > -1) {
+            if(strength > 0) {
                 IconButton(onClick = {
                     nc?.navigate(
                         Screen.ScanSingle.route.replace(

@@ -1,6 +1,7 @@
 package com.rtknits.rt_knits_samplefinder.scanners
 
 import android.content.Context
+import android.util.Log
 import com.rscja.deviceapi.RFIDWithUHFUART
 import com.rscja.deviceapi.interfaces.ConnectionStatus
 import java.util.function.IntConsumer
@@ -40,6 +41,19 @@ class ChainwayScannerServiceImpl : ScannerService {
         }
 
     }
+
+//    override fun connect(){
+//        connected = try {
+//            val res = mReader.init()
+//            if (!res) {
+//                // problem with connecting!
+//                throw UnsatisfiedLinkError()
+//            }
+//            true;
+//        } catch (e: UnsatisfiedLinkError) {
+//            false;
+//        }
+//    }
 
     override fun getScannerName(): String {
         return "Chainway"
@@ -81,11 +95,12 @@ class ChainwayScannerServiceImpl : ScannerService {
             inventoryingThread = thread(start = true, isDaemon = true) {
                 while (true) {
                     try {
-                        val tagInfo: UHFTAGInfo? = mReader.readTagFromBuffer();
-                        if (tagInfo != null) {
-                            println("${tagInfo.epc} :blop: ${tagInfo.rssi}")
-                            inventoryListeners.forEach { listener ->
-                                listener(tagInfo.epc, tagInfo.rssi)
+                        if(activeMode == Modes.MULTI){
+                            val tagInfo: UHFTAGInfo? = mReader.readTagFromBuffer();
+                            if (tagInfo != null) {
+                                inventoryListeners.forEach { listener ->
+                                    listener(tagInfo.epc, tagInfo.rssi)
+                                }
                             }
                         }
                     } catch (e: InterruptedException) {
@@ -117,8 +132,7 @@ class ChainwayScannerServiceImpl : ScannerService {
             Modes.MULTI -> {
                 // register the RFID for scanning!
                 inventoryListeners.add { epc: String, rssi: String ->
-                    print("${epc} : : ${targetEPCHex} : : ${rssi}")
-                    if (epcAreEqual(targetEPCHex, epc)) {
+                    if (epcAreEqual(targetEPCHex, epc) && rssi != "N/A") {
                         callback.accept(rssiToStrength(rssi.toDouble()))
                     }
                 }
@@ -127,21 +141,21 @@ class ChainwayScannerServiceImpl : ScannerService {
     }
 
     override fun stopLocateMultipleRFID() {
-        mReader.stopInventory()
-        inventoryingThread.interrupt()
         activeMode = null
+        inventoryingThread.interrupt()
+        mReader.stopInventory()
     }
 
-    override fun cleanup() {
+    override fun disconnect() {
         stopLocateSingleRFID();
         stopLocateMultipleRFID();
         mReader.free()
         connected = false;
-
     }
 }
 
-fun rssiToStrength(rssi: Double, minRssi: Int = -100, maxRssi: Int = -50): Int {
+fun rssiToStrength(rssi: Double, minRssi: Int = -100, maxRssi: Int = -30): Int {
+    Log.i("jeff", rssi.toString())
     return when {
         rssi < minRssi -> 0
         rssi > maxRssi -> 100
@@ -161,6 +175,4 @@ fun epcAreEqual(aHex: String, bHexPadded: String): Boolean {
 }
 
 class LocateMultiRFIDexception(message: String? = null, cause: Throwable? = null) :
-    Exception(message, cause) {
-    constructor(cause: Throwable) : this(null, cause)
-}
+    Exception(message, cause)

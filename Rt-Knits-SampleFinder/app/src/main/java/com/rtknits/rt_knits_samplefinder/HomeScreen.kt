@@ -62,12 +62,9 @@ fun HomeScreen() {
     val sheetState = rememberModalBottomSheetState()
     val sampleIds = remember { mutableStateListOf<String>() }
 
-    // auto open keyboard!
     LaunchedEffect(Unit) {
-        delay(200)
-//        val a = ChainwayScannerServiceImpl();
-//        a.startScanning()
-//        a.test()
+        sampleIds.add("hello")
+        sampleIds.add("jello")
     }
 
     Scaffold(bottomBar = {

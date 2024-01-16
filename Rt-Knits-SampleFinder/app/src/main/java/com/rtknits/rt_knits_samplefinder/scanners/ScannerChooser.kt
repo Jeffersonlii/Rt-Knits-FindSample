@@ -22,10 +22,6 @@ class ScannerChooser {
             throw NoScannerDetected()
         }
     }
-
-
-
-
 }
 
 class NoScannerDetected() : Exception()

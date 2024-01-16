@@ -38,6 +38,7 @@ fun StrengthChart(data: List<Int>, modifier: Modifier = Modifier) {
     val maxValue = 100
     val minValue = 0
     val newestData = if (data.isEmpty()) 0 else data.last()
+    print(newestData)
 
     Box(modifier = Modifier.fillMaxHeight()) {
         Canvas(modifier = modifier) {

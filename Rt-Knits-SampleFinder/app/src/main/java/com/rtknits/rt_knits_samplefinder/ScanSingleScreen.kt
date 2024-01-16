@@ -24,11 +24,11 @@ import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
 @Composable
 fun ScanSingleScreen(sampleID: String) {
     KeepScreenOn()
-    val scannerService = remember { ScannerChooser.getAttachedScanner() }
+//    val scannerService = remember { ScannerChooser.getAttachedScanner() }
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxHeight()) {
-        LocateSingle(sampleID, scannerService)
+        LocateSingle(sampleID)
         OutlinedButton(onClick = {}, enabled = true, modifier = Modifier
             .padding(12.dp, 8.dp)
             .fillMaxWidth()

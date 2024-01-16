@@ -1,9 +1,12 @@
 package com.rtknits.rt_knits_samplefinder
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -12,8 +15,12 @@ import androidx.lifecycle.Lifecycle
 import com.rtknits.rt_knits_samplefinder.components.KeepScreenOn
 import com.rtknits.rt_knits_samplefinder.components.OnLifecycleEvent
 import com.rtknits.rt_knits_samplefinder.components.PingSingle
+import com.rtknits.rt_knits_samplefinder.components.encodeHex
+import com.rtknits.rt_knits_samplefinder.scanners.ChainwayScannerServiceImpl
 import com.rtknits.rt_knits_samplefinder.scanners.ScannerChooser
+import com.rtknits.rt_knits_samplefinder.scanners.ScannerService
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
+import kotlin.concurrent.thread
 
 data class SearchingSample(val sampleId: String, var strength: Int)
 
@@ -21,16 +28,28 @@ data class SearchingSample(val sampleId: String, var strength: Int)
 fun ScanMultiScreen(sampleIDs: Array<String>) {
     KeepScreenOn()
     val scanner = remember { ScannerChooser.getAttachedScanner() }
-    val strengths = remember{ Array(sampleIDs.size){
-        SearchingSample(sampleIDs[it], 0)}
+
+    val strengths = remember { mutableStateListOf<SearchingSample>() }
+    DisposableEffect(Unit) {
+        strengths.clear()
+        sampleIDs.forEach { id ->
+            strengths.add(SearchingSample(id, 0))
+        }
+        onDispose {
+        }
     }
+
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
+                Log.i("jeff", "starting")
                 scanner.startLocateMultipleRFID()
                 sampleIDs.forEachIndexed { i, sampleId ->
-                    scanner.registerRFIDtoLocate(sampleId) {
-                        strengths[i].strength = it
+                    scanner.registerRFIDtoLocate(encodeHex(sampleId)) { strength ->
+                        val cp = strengths[i].copy()
+                        cp.strength = strength
+
+                        strengths[i] = cp
                     }
                 }
             }
@@ -40,7 +59,7 @@ fun ScanMultiScreen(sampleIDs: Array<String>) {
             }
 
             Lifecycle.Event.ON_DESTROY -> {
-                scanner.cleanup()
+                scanner.disconnect()
             }
 
             else -> Unit
@@ -51,9 +70,7 @@ fun ScanMultiScreen(sampleIDs: Array<String>) {
         modifier = Modifier.fillMaxHeight(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        strengths.sortedArrayWith {
-            a1, a2 -> a2.strength - a1.strength
-        }.forEach  { (sid, strength) ->
+        strengths.sortedByDescending { it.strength }.forEach { (sid, strength) ->
             PingSingle(sid, strength)
         }
     }

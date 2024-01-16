@@ -45,7 +45,7 @@ fun Base() {
     val navController = rememberNavController()
     var scannerService by remember { mutableStateOf<ScannerService?>(null) }
     var openNoDeviceDialog by remember { mutableStateOf(false) }
-    var openConnectingDialog by remember { mutableStateOf(true) }
+    var openConnectingDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         try {

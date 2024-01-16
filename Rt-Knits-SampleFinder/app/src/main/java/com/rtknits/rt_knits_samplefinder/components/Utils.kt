@@ -7,6 +7,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -36,9 +37,10 @@ fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) ->
 }
 
 fun encodeHex(input: String): String {
-    return input.map { it.code.toString(16) }.joinToString("").uppercase(
-        Locale.getDefault()
-    )
+    return input.lowercase()
+        .map { it.code.toString(16) }
+        .joinToString("")
+        .uppercase(Locale.getDefault())
 }
 
 fun Modifier.disableClickAndRipple(): Modifier =
@@ -47,13 +49,11 @@ fun Modifier.disableClickAndRipple(): Modifier =
         onClick = { },
     )
 
-fun strengthToTip(strength: Int): String{
+fun strengthToTip(strength: Int): String {
     return when {
         strength >= 100 -> "Right Next to You"
         strength >= 50 -> "In Close Vicinity"
         strength >= 1 -> "Detected"
         else -> "Not Detected"
     }
-
-
 }

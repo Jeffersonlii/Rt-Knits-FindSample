@@ -1,5 +1,6 @@
 package com.rtknits.rt_knits_samplefinder.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
+import com.rtknits.rt_knits_samplefinder.scanners.ChainwayScannerServiceImpl
 import com.rtknits.rt_knits_samplefinder.scanners.ScannerChooser
 import com.rtknits.rt_knits_samplefinder.scanners.ScannerService
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
@@ -27,11 +29,12 @@ import kotlin.concurrent.thread
 import kotlin.math.max
 
 @Composable
-fun LocateSingle(sampleID: String, scanner: ScannerService?) {
+fun LocateSingle(sampleID: String) {
     var lastPeriodicMax by remember {
         mutableStateOf(0)
     }
     val points = remember { mutableStateListOf<Int>() }
+    val scanner = remember { ScannerChooser.getAttachedScanner() }
 
     val context = LocalContext.current
 
@@ -41,17 +44,17 @@ fun LocateSingle(sampleID: String, scanner: ScannerService?) {
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
                 // the RFID of the sample is simply the hex of the sampleID !
-                scanner?.startLocateSingleRFID(context, encodeHex(sampleID)) {
+                scanner.startLocateSingleRFID(context, encodeHex(sampleID)) {
                     lastPeriodicMax = max(it, lastPeriodicMax)
                 }
             }
 
             Lifecycle.Event.ON_PAUSE -> {
-                scanner?.stopLocateSingleRFID()
+                scanner.stopLocateSingleRFID()
             }
 
             Lifecycle.Event.ON_DESTROY -> {
-                scanner?.cleanup()
+                scanner.disconnect()
             }
 
             else -> Unit
@@ -96,6 +99,6 @@ fun LocateSingle(sampleID: String, scanner: ScannerService?) {
 @Composable
 fun LocateSinglePreview() {
     RtknitsSampleFinderTheme {
-        LocateSingle("123", null)
+        LocateSingle("123")
     }
 }

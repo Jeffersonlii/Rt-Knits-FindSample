@@ -7,8 +7,12 @@ interface ScannerService {
 
     fun getScannerName(): String
     fun isConnected(): Boolean
-    fun startLocateRFID(context: Context, targetEPCHex: String, callback: IntConsumer)
-    fun stopLocateRFID()
+    fun startLocateSingleRFID(context: Context, targetEPCHex: String, callback: IntConsumer): Boolean
+    fun stopLocateSingleRFID()
+
+    fun startLocateMultipleRFID(): Boolean
+    fun registerRFIDtoLocate(targetEPCHex: String, callback: IntConsumer)
+    fun stopLocateMultipleRFID()
 
     fun cleanup()
 }

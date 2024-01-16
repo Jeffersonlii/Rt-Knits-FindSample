@@ -3,10 +3,14 @@ package com.rtknits.rt_knits_samplefinder.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,10 +28,10 @@ import androidx.navigation.compose.rememberNavController
 import com.rtknits.rt_knits_samplefinder.R
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header(nc: NavHostController, deviceName: String) {
+fun Header(deviceName: String) {
     val context = LocalContext.current
-
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -71,7 +75,6 @@ fun Header(nc: NavHostController, deviceName: String) {
                 )
             }
         }
-
     }
 }
 
@@ -79,6 +82,6 @@ fun Header(nc: NavHostController, deviceName: String) {
 @Composable
 fun HeaderPreview() {
     RtknitsSampleFinderTheme {
-        Header(nc = rememberNavController(), deviceName = "Chainway")
+        Header(deviceName = "Chainway")
     }
 }

@@ -1,20 +1,30 @@
 package com.rtknits.rt_knits_samplefinder.scanners
 
-// since this app can run on 2 different devices (Sunmi, Chainway)
+// chooses between multiple vendors of RFID scanners
+// right now we only work with chainway SDK
 // we use this service to detect which device is currently connected
 class ScannerChooser {
-    private val scanners =arrayOf<ScannerService>(
-        ChainwayScannerServiceImpl(),
-//        SunmiScannerServiceImpl() //Sunmi sucks, dont support it anymore
-    )
-    fun getAttachedScanner(): ScannerService{
-        for (scanner in scanners) {
-            if(scanner.isConnected()){
-                return scanner
+    companion object {
+        private val scanners =arrayOf<ScannerService>(
+            ChainwayScannerServiceImpl(),
+        )
+        private var attachedScanner: ScannerService? = null;
+        fun getAttachedScanner(): ScannerService{
+            val s = attachedScanner
+            if(s != null) return s
+
+            for (scanner in scanners) {
+                if(scanner.isConnected()){
+                    attachedScanner = scanner
+                    return scanner
+                }
             }
+            throw NoScannerDetected()
         }
-        throw NoScannerDetected()
     }
+
+
+
 
 }
 

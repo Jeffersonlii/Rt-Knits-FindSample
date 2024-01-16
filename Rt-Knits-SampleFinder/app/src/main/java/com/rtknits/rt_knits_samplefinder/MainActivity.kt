@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,7 +26,6 @@ import com.rtknits.rt_knits_samplefinder.scanners.ScannerService
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
 import com.sunmi.rfid.RFIDManager
 import kotlinx.coroutines.delay
-
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +48,8 @@ fun Base() {
     var openConnectingDialog by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        // delay 1 second for Sunmi to connect
-//        delay(1000)
         try {
-            scannerService = ScannerChooser().getAttachedScanner()
+            scannerService = ScannerChooser.getAttachedScanner()
         } catch (e: NoScannerDetected) {
             openNoDeviceDialog = true
         } finally {
@@ -62,7 +60,7 @@ fun Base() {
     Scaffold(
         topBar = {
             Box(modifier = Modifier.padding(16.dp)) {
-                Header(navController, scannerService?.getScannerName() ?: "")
+                Header(scannerService?.getScannerName() ?: "")
             }
         },
         bottomBar = {
@@ -83,8 +81,8 @@ fun Base() {
                         onDismissRequest = { },
                         onConfirmation = { },
                         dialogTitle = "No UHF Device Detected",
-                        dialogText = "Make sure this app is running on a Chainway or Sunmi UHF device." +
-                                "Make sure electronics are turned on and charged.",
+                        dialogText = "Make sure this app is running on a Chainway or Sunmi UHF device.\n" +
+                                "Make sure electronics are turned on and charged.\n" + "Make sure no other apps are using the scanner.",
                     )
                 }
 

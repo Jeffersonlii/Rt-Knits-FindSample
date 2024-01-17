@@ -81,7 +81,27 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(Unit){
+    var trailerExpanded by remember { mutableStateOf(false) }
+    var selectedTrailerOption by remember { mutableStateOf(sampleIDTrailing) }
+    val onAddSample = remember {
+        {
+            scope.launch {
+                // scroll to bottom of list of sampleids
+                listState.animateScrollToItem(sampleIds.size - 1)
+
+                // expand sheet to fullest so our input remains visible
+                sheetState.expand()
+            }
+
+            // dont add if sample is already added
+            if (sampleIds.find { s -> s.lowercase() == inputSampleId.lowercase() } == null) {
+                sampleIds.add("$inputSampleId$selectedTrailerOption".uppercase())
+            }
+            inputSampleId = ""
+        }
+    }
+
+    LaunchedEffect(Unit) {
         sheetState.expand()
     }
 
@@ -92,7 +112,7 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Select Samples to Locate - ${sampleIds.size}",
+            text = "${sampleIds.size} Sample(s) Selected",
             style = MaterialTheme.typography.titleLarge,
         )
 
@@ -103,7 +123,7 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
             border = BorderStroke(1.dp, Color.Black),
 
 
-        ) {
+            ) {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -163,6 +183,7 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
                     .weight(1f),
                 keyboardActions = KeyboardActions(
                     onDone = {
+                        onAddSample()
                         focusManager.clearFocus()
                     }),
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
@@ -177,12 +198,9 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
                 }
             )
 
-            var expanded by remember { mutableStateOf(false) }
-            var selectedOptionText by remember { mutableStateOf(sampleIDTrailing) }
-
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
+                expanded = trailerExpanded,
+                onExpandedChange = { trailerExpanded = it },
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(60.dp),
@@ -191,45 +209,29 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
                     modifier = Modifier.menuAnchor(),
                     readOnly = true,
                     label = { Text("") },
-                    value = selectedOptionText,
+                    value = selectedTrailerOption,
                     onValueChange = {},
-//                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
                 )
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
+                    expanded = trailerExpanded,
+                    onDismissRequest = { trailerExpanded = false },
                 ) {
                     trailingOptions.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(selectionOption) },
                             onClick = {
-                                selectedOptionText = selectionOption
-                                expanded = false
+                                selectedTrailerOption = selectionOption
+                                trailerExpanded = false
                             },
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                         )
                     }
                 }
             }
-
             when {
                 inputSampleId != "" -> {
-                    IconButton(modifier = Modifier.padding(top = 8.dp), onClick = {
-                        scope.launch {
-                            // scroll to bottom of list of sampleids
-                            listState.animateScrollToItem(sampleIds.size - 1)
-
-                            // expand sheet to fullest so our input remains visible
-                            sheetState.expand()
-                        }
-
-                        // dont add if sample is already added
-                        if (sampleIds.find { s -> s.lowercase() == inputSampleId.lowercase() } == null) {
-                            sampleIds.add("$inputSampleId$selectedOptionText".uppercase())
-                        }
-                        inputSampleId = ""
-                    }) {
+                    IconButton(modifier = Modifier.padding(top = 8.dp), onClick = onAddSample) {
                         Icon(Icons.Outlined.Add, contentDescription = "Localized description")
                     }
                 }

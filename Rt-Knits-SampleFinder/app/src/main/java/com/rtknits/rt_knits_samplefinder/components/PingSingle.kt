@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -94,7 +98,7 @@ fun PingSingle(sampleID: String, state: PingSingleState, modifier: Modifier = Mo
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = BorderStroke(
-            1.dp,
+            if (state.highestPingOnChart > 0) 2.dp else 1.dp,
             if (state.highestPingOnChart > 0) Color(
                 ContextCompat.getColor(
                     context,
@@ -102,22 +106,10 @@ fun PingSingle(sampleID: String, state: PingSingleState, modifier: Modifier = Mo
                 )
             ) else Color.Black
         ),
-        onClick = {
-            if (state.highestPingOnChart > 0) {
-                nc?.navigate(
-                    Screen.ScanSingle.route.replace(
-                        "{sampleID}", sampleID
-                    )
-                )
-            }
-        },
         modifier = modifier
     )
     {
-        Box(
-            modifier = Modifier
-                .aspectRatio(1f)
-        ) {
+        Box{
             StrengthChart(
                 state.strengths,
                 modifier = Modifier
@@ -127,35 +119,38 @@ fun PingSingle(sampleID: String, state: PingSingleState, modifier: Modifier = Mo
             )
             Column(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .padding(start = 8.dp)
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-
-                    ) {
-                    Text(
-                        text = sampleID,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Box(modifier = Modifier.weight(1f))
-
-                    if (state.highestPingOnChart > 0) {
-                        Icon(
-                            Icons.Outlined.PlayArrow,
-                            contentDescription = "Focus",
-                            modifier = Modifier.padding(8.dp)
-                        )
-                    } else {
-                        IconButton(onClick = {}, enabled = false) {}
-                    }
-                }
+                Text(
+                    text = sampleID,
+                    style = MaterialTheme.typography.titleLarge
+                )
                 Text(
                     text = strengthToTip(state.highestPingOnChart),
                     style = MaterialTheme.typography.bodyLarge
                 )
+                Box(modifier = Modifier.weight(1f))
+
+                if (state.highestPingOnChart > 0) {
+                    ElevatedButton(
+                        onClick = {
+                            nc?.navigate(
+                                Screen.ScanSingle.route.replace(
+                                    "{sampleID}", sampleID
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Isolate")
+                        Icon(
+                            Icons.AutoMirrored.Outlined.ArrowForward,
+                            contentDescription = "Focus",
+                            modifier = Modifier.padding(start = 2.dp)
+                        )
+                    }
+                }
             }
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -63,8 +64,8 @@ fun HomeScreen() {
     val sampleIds = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
-        sampleIds.add("HELLO")
-        sampleIds.add("ASD")
+//        sampleIds.add("HELLO")
+//        sampleIds.add("ASD")
 //        sampleIds.add("JELLO")
 //        sampleIds.add("ONE")
     }
@@ -81,8 +82,6 @@ fun HomeScreen() {
                 onClick = {
                     showBottomSheet = true
                 })
-
-
 
             if (sampleIds.size > 0) {
                 ExtendedFloatingActionButton(
@@ -125,11 +124,14 @@ fun HomeScreen() {
                 ModalBottomSheet(
                     onDismissRequest = {
                         showBottomSheet = false
-                    }, sheetState = sheetState
-                ) {
-                    // sampleIds are modified within the SampleSelect Composable
-                    SampleSelect(sheetState, sampleIds)
-                }
+                    },
+                    sheetState = sheetState,
+                    modifier = Modifier.imePadding(),
+                    content = {
+                        // sampleIds are modified within the SampleSelect Composable
+                        SampleSelect(sheetState, sampleIds)
+                    }
+                )
             }
         }
     }

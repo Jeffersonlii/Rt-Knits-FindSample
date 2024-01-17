@@ -42,19 +42,6 @@ class ChainwayScannerServiceImpl : ScannerService {
 
     }
 
-//    override fun connect(){
-//        connected = try {
-//            val res = mReader.init()
-//            if (!res) {
-//                // problem with connecting!
-//                throw UnsatisfiedLinkError()
-//            }
-//            true;
-//        } catch (e: UnsatisfiedLinkError) {
-//            false;
-//        }
-//    }
-
     override fun getScannerName(): String {
         return "Chainway"
     }
@@ -142,6 +129,7 @@ class ChainwayScannerServiceImpl : ScannerService {
 
     override fun stopLocateMultipleRFID() {
         activeMode = null
+        inventoryListeners.clear()
         inventoryingThread.interrupt()
         mReader.stopInventory()
     }
@@ -155,7 +143,6 @@ class ChainwayScannerServiceImpl : ScannerService {
 }
 
 fun rssiToStrength(rssi: Double, minRssi: Int = -100, maxRssi: Int = -30): Int {
-    Log.i("jeff", rssi.toString())
     return when {
         rssi < minRssi -> 0
         rssi > maxRssi -> 100

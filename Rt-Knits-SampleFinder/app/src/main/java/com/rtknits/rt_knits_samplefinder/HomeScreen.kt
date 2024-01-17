@@ -63,12 +63,13 @@ fun HomeScreen() {
     val sampleIds = remember { mutableStateListOf<String>() }
 
     LaunchedEffect(Unit) {
-        sampleIds.add("hello")
-        sampleIds.add("jello")
+        sampleIds.add("HELLO")
+        sampleIds.add("ASD")
+//        sampleIds.add("JELLO")
+//        sampleIds.add("ONE")
     }
 
-    Scaffold(bottomBar = {
-
+    Scaffold(modifier = Modifier.padding(16.dp), bottomBar = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -116,7 +117,7 @@ fun HomeScreen() {
     }) { padding ->
         Paragraph(modifier = Modifier
             .padding(padding)
-            .padding(bottom = 16.dp)
+            .padding(bottom = 8.dp)
             .fillMaxWidth()
             .clickable { focusManager.clearFocus() })
         when {

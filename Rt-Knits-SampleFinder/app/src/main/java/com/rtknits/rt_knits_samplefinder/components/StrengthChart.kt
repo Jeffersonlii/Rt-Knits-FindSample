@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -29,18 +30,17 @@ import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
 import kotlin.math.max
 import kotlin.math.min
 
-const val maxPoints = 20;
+const val maxPoints = 40;
 
 @Composable
-fun StrengthChart(data: List<Int>, modifier: Modifier = Modifier) {
+fun StrengthChart(data: List<Int>, modifier: Modifier = Modifier, graphOnly: Boolean = false,  ) {
     val context = LocalContext.current
     val chartData = data.takeLast(maxPoints)
     val maxValue = 100
     val minValue = 0
     val newestData = if (data.isEmpty()) 0 else data.last()
-    print(newestData)
 
-    Box(modifier = Modifier.fillMaxHeight()) {
+    Box() {
         Canvas(modifier = modifier) {
             // slightly make the canvas width bigger, because we want to overflow to the left
             // we want to overflow to hide the jankey cubic bezier transition.
@@ -101,15 +101,20 @@ fun StrengthChart(data: List<Int>, modifier: Modifier = Modifier) {
             }
         }
 
-        // draw the middle text
-        Column(modifier = Modifier.align(Alignment.Center)
-            , horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "$newestData", style = MaterialTheme.typography.displayLarge
-            )
-            Text(
-                text = strengthToTip(newestData), style = MaterialTheme.typography.headlineLarge
-            )
+        if(!graphOnly){
+            // draw the middle text
+            Column(modifier = Modifier.align(Alignment.Center)
+                , horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "$newestData",
+                    style = MaterialTheme.typography.displayLarge
+                )
+                Text(
+                    text = strengthToTip(newestData),
+                    style = MaterialTheme.typography.headlineLarge,
+
+                )
+            }
         }
     }
 }
@@ -119,7 +124,7 @@ fun StrengthChart(data: List<Int>, modifier: Modifier = Modifier) {
 fun StrengthPreview() {
     RtknitsSampleFinderTheme {
         StrengthChart(
-            listOf(1, 2, 3, 4, 5, 80, 50), modifier = Modifier
+            listOf(1, 2, 3, 4, 5, 80, 50,3,4,6,3,12,2,32,1,9,23,23,4,5,4), modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
         )

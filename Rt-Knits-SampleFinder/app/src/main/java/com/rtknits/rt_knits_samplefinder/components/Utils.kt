@@ -1,12 +1,21 @@
 package com.rtknits.rt_knits_samplefinder.components
 
+import android.annotation.SuppressLint
+import android.graphics.Rect
 import android.view.View
+import android.view.ViewTreeObserver
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
@@ -51,8 +60,8 @@ fun Modifier.disableClickAndRipple(): Modifier =
 
 fun strengthToTip(strength: Int): String {
     return when {
-        strength >= 100 -> "Right Next to You"
-        strength >= 50 -> "In Close Vicinity"
+        strength >= 80 -> "In Immediate Vicinity"
+        strength >= 50 -> "Nearby"
         strength >= 1 -> "Detected"
         else -> "Not Detected"
     }

@@ -4,7 +4,7 @@ This Android application allows users to utilize the RFID scanner on their devic
 [Sunmi UHF Reader](https://www.sunmi.com/en-US/l2k/)
 
 # Download
-The App can be downloaded by using the APK provided in this repository (`app.apk`)
+The App can be downloaded by using the APK provided in `releases`
 
 # Features
 

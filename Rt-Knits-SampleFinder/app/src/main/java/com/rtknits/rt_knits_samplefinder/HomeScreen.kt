@@ -48,7 +48,7 @@ fun HomeScreen() {
 
     val focusManager = LocalFocusManager.current
     var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val sampleIds = rememberSaveableMutableStateListOf<String>()
 
     LaunchedEffect(Unit) {
@@ -74,33 +74,18 @@ fun HomeScreen() {
             if (sampleIds.size > 0) {
                 ExtendedFloatingActionButton(
                     modifier = Modifier.weight(1f),
-                    text = { Text("Search ${sampleIds.size} Samples") },
+                    text = { Text("Find ${sampleIds.size} Sample(s)") },
                     icon = { Icon(Icons.Filled.Place, contentDescription = "add") },
                     onClick = {
 
                         // navigate to scanning screen
-                        when (sampleIds.size) {
-                            1 -> {
-                                nc?.navigate(
-                                    Screen.ScanSingle.route.replace(
-                                        "{sampleID}", sampleIds[0]
-                                    )
-                                )
-                            }
-                            else -> {
-                                nc?.navigate(
-                                    Screen.ScanMultiple.route.replace(
-                                        "{sampleIDs}", sampleIds.joinToString(separator = ",")
-                                    )
-                                )
-                            }
+                        if (nc != null) {
+                            gotoScan(nc, sampleIds)
                         }
                     },
                 )
             }
         }
-
-
     }) { padding ->
         Paragraph(modifier = Modifier
             .padding(padding)
@@ -148,6 +133,7 @@ fun Paragraph(modifier: Modifier = Modifier) {
         Instructions:
             1. Input the SampleID of the sample
             2. Scan your surroundings and locate the item via the signal strength
+            3. When scanning multiple RFIDs, you can "Focus" on a single RFID for better signal strength
             """, style = MaterialTheme.typography.bodyMedium
             )
             Text(

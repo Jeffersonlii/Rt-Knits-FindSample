@@ -1,31 +1,25 @@
 package com.rtknits.rt_knits_samplefinder.components
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -39,13 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.rtknits.rt_knits_samplefinder.NavControllerContext
 import com.rtknits.rt_knits_samplefinder.R
-import com.rtknits.rt_knits_samplefinder.Screen
+import com.rtknits.rt_knits_samplefinder.gotoScan
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -87,6 +79,7 @@ class PingSingleState(sampleID: String) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PingSingle(sampleID: String, state: PingSingleState, modifier: Modifier = Modifier) {
     val nc = NavControllerContext.current
@@ -109,7 +102,7 @@ fun PingSingle(sampleID: String, state: PingSingleState, modifier: Modifier = Mo
         modifier = modifier
     )
     {
-        Box{
+        Box {
             StrengthChart(
                 state.strengths,
                 modifier = Modifier
@@ -122,34 +115,36 @@ fun PingSingle(sampleID: String, state: PingSingleState, modifier: Modifier = Mo
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = sampleID,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = strengthToTip(state.highestPingOnChart),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Box(modifier = Modifier.weight(1f))
+                FlowRow (
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()){
+                    Text(
+                        text = annotateSampleId(sampleID),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = strengthToTip(state.highestPingOnChart),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
 
-                if (state.highestPingOnChart > 0) {
-                    ElevatedButton(
-                        onClick = {
-                            nc?.navigate(
-                                Screen.ScanSingle.route.replace(
-                                    "{sampleID}", sampleID
-                                )
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Isolate")
-                        Icon(
-                            Icons.AutoMirrored.Outlined.ArrowForward,
-                            contentDescription = "Focus",
-                            modifier = Modifier.padding(start = 2.dp)
-                        )
-                    }
+                Box(modifier = Modifier.weight(1f))
+                ElevatedButton(
+                    enabled = state.highestPingOnChart > 0,
+                    onClick = {
+                        if (nc != null) {
+                            gotoScan(nc, listOf(sampleID))
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Focus on Sample")
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowForward,
+                        contentDescription = "Focus",
+                        modifier = Modifier.padding(start = 2.dp)
+                    )
                 }
             }
         }

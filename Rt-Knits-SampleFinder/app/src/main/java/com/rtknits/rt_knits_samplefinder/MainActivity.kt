@@ -75,7 +75,6 @@ fun Base() {
         Box(
             modifier = Modifier
                 .padding(innerPadding)
-//                .padding(16.dp)
         ) {
             NavGraph(navController)
 

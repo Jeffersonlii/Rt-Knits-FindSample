@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -51,7 +52,7 @@ fun ScanMultiScreen(sampleIDs: Array<String>) {
 
             Lifecycle.Event.ON_PAUSE -> {
                 scanner.stopLocateMultipleRFID()
-                strengths.forEach{s-> s.state.finalize()}
+                strengths.forEach { s -> s.state.finalize() }
                 strengths.clear()
             }
 
@@ -64,10 +65,12 @@ fun ScanMultiScreen(sampleIDs: Array<String>) {
     }
 
     if (strengths.size < 5) {
-        Column(modifier = Modifier
-            .fillMaxHeight()
-            .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             strengths.forEach { s ->
                 PingSingle(
                     s.sampleId,
@@ -79,6 +82,8 @@ fun ScanMultiScreen(sampleIDs: Array<String>) {
             }
         }
     } else {
+        //move to scroll grid display on many samples
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -86,9 +91,9 @@ fun ScanMultiScreen(sampleIDs: Array<String>) {
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxHeight()
         ) {
-            itemsIndexed(
+            items(
                 strengths
-            ) { index, s ->
+            ) { s ->
                 PingSingle(
                     s.sampleId,
                     s.state,

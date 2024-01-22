@@ -67,17 +67,16 @@ fun LocateSingle(sampleID: String) {
     }
 
     // coroutine for periodically updating the graph
-    LaunchedEffect(key1 = coroutinePause){
-            while (!coroutinePause) {
-                try {
-                    delay(100)
-                    points.add(lastPeriodicMax)
-                    lastPeriodicMax = 0
-                } catch (e: InterruptedException) {
-                    break
-                }
+    LaunchedEffect(key1 = coroutinePause) {
+        while (!coroutinePause) {
+            try {
+                delay(100)
+                points.add(lastPeriodicMax)
+                lastPeriodicMax = 0
+            } catch (e: InterruptedException) {
+                break
             }
-        
+        }
     }
 
     OutlinedCard(

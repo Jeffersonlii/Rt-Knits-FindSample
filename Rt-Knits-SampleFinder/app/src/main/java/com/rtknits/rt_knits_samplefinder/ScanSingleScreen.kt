@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.rtknits.rt_knits_samplefinder.components.KeepScreenOn
 import com.rtknits.rt_knits_samplefinder.components.LocateSingle
+import com.rtknits.rt_knits_samplefinder.components.annotateSampleId
 import com.rtknits.rt_knits_samplefinder.components.disableClickAndRipple
 import com.rtknits.rt_knits_samplefinder.scanners.ScannerChooser
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
@@ -36,8 +37,11 @@ fun ScanSingleScreen(sampleID: String) {
                 .align(Alignment.BottomCenter)
         ) {
             Text(
-                "Sample ID : $sampleID",
-                modifier = Modifier,
+                "Sample ID : ",
+                color = Color.Black,
+            )
+            Text(
+                annotateSampleId(sampleID),
                 color = Color.Black,
             )
         }

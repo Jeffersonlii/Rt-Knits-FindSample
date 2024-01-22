@@ -7,6 +7,10 @@ The applications include:
 - SampleFinder: An Android application that allows users to scan for the location of RFID tags using the RFID scanner on their devices. This app is compatible with Chainway C5 UHF RFID Reader and Sunmi UHF Reader.
 - Rt-Knits-RFIDPrinter: A web application that allows users to print RFID labels based on the sample ID using the Chainway CP30 printer AND the Zebra ZD612R printer.
 
+# Installation
+
+Look in `releases` for downloadable binaries
+
 # WorkFlow
 
 The workflow of using these applications is as follows:

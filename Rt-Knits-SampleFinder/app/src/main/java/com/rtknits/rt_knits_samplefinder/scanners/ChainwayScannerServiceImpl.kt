@@ -8,6 +8,13 @@ import java.util.function.IntConsumer
 import com.rscja.deviceapi.entity.UHFTAGInfo
 import com.rscja.deviceapi.interfaces.IUHF
 import com.sunmi.rfid.ReaderCall
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.concurrent.thread
 import kotlin.math.max
 import kotlin.math.min
@@ -23,7 +30,7 @@ class ChainwayScannerServiceImpl : ScannerService {
         private var connected = false;
 
         private var activeMode: Modes? = null;
-        private var inventoryingThread = Thread();
+        private var inventoryJob: Job? = null
         private var inventoryListeners = mutableListOf<(String, String) -> Any>()
 
         init {
@@ -73,26 +80,24 @@ class ChainwayScannerServiceImpl : ScannerService {
         mReader.stopLocation()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun startLocateMultipleRFID(): Boolean {
         val attempt = mReader.startInventoryTag()
         if (attempt) {
             activeMode = Modes.MULTI;
 
             inventoryListeners.clear();
-            inventoryingThread = thread(start = true, isDaemon = true) {
-                while (true) {
-                    try {
-                        if(activeMode == Modes.MULTI){
-                            val tagInfo: UHFTAGInfo? = mReader.readTagFromBuffer();
-                            if (tagInfo != null) {
-                                inventoryListeners.forEach { listener ->
-                                    listener(tagInfo.epc, tagInfo.rssi)
-                                }
+            inventoryJob = GlobalScope.launch(Dispatchers.IO) {
+                while (isActive) {
+                    val tagInfo: UHFTAGInfo? = mReader.readTagFromBuffer()
+                    if (tagInfo != null) {
+
+                        // when RFID is found, switch to the main thread to perform UI updates
+                        withContext(Dispatchers.Main) {
+                            inventoryListeners.forEach { listener ->
+                                listener(tagInfo.epc, tagInfo.rssi)
                             }
                         }
-                    } catch (e: InterruptedException) {
-                        // The thread was interrupted, stop looping
-                        break
                     }
                 }
             }
@@ -130,7 +135,7 @@ class ChainwayScannerServiceImpl : ScannerService {
     override fun stopLocateMultipleRFID() {
         activeMode = null
         inventoryListeners.clear()
-        inventoryingThread.interrupt()
+        inventoryJob?.cancel()
         mReader.stopInventory()
     }
 

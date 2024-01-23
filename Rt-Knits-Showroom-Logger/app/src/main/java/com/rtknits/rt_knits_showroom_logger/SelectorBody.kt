@@ -1,101 +1,58 @@
 package com.rtknits.rt_knits_showroom_logger
 
-import android.graphics.Color.alpha
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.rounded.KeyboardArrowLeft
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
-import com.rtknits.rt_knits_showroom_logger.components.SampleIDInput
 import com.rtknits.rt_knits_showroom_logger.components.ToggleableSampleInput
 import com.rtknits.rt_knits_showroom_logger.components.annotateSampleId
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun SelectorBody(
-    sampleIds: SnapshotStateList<String>,
+    sampleIds: MutableList<String>,
     modifier: Modifier = Modifier,
+    conflictingSamples: MutableList<String> = mutableListOf(),
     borderStroke: BorderStroke = BorderStroke(1.dp, Color.Black),
     containerColor: Color = Color.White,
-    isScanModeOn: Boolean = false,
+    isScanModeOnState: MutableState<Boolean> = mutableStateOf(false),
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    var isManualInput by remember { mutableStateOf(false) }
 
-    val onAddManually = remember {
+    val onAddManually = remember(key1 = sampleIds) {
         { sampleId: String ->
             scope.launch {
                 // scroll to bottom of list of sampleids
@@ -125,25 +82,40 @@ fun SelectorBody(
             when (sampleIds.size) {
                 0 -> {
                     Column(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        if (!isScanModeOn) {
+
+                        if (!isScanModeOnState.value) {
+                            Box(modifier = Modifier.weight(1f))
+
                             Text(
                                 text = "No Samples Selected",
                                 style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier
-                                    .padding(0.dp, 12.dp)
                             )
+                            TextButton(
+                                onClick = { isScanModeOnState.value = !isScanModeOnState.value },
+                                enabled = !isScanModeOnState.value
+                            ) {
+                                Column(
+                                ) {
+                                    Text(
+                                        "Scan for Samples",
+                                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                                    )
+                                }
+                            }
+                            Box(modifier = Modifier.weight(1f))
                             ToggleableSampleInput(
-                                isShow = isManualInput,
-                                onToggle = {
-                                    isManualInput = !isManualInput
-                                },
                                 onAdd = onAddManually,
                                 modifier = Modifier
-                                    .padding(end = 8.dp, bottom = 8.dp)
+                                    .padding(end = 8.dp)
+                                    .padding(bottom = 8.dp)
+                                    .padding(start = 8.dp)
+                                    .align(Alignment.Start)
                             )
                         }
                     }
@@ -158,28 +130,31 @@ fun SelectorBody(
                                 ListItem(
                                     headlineContent = { Text(annotateSampleId(sampleId)) },
                                     trailingContent = {
-                                        if (isScanModeOn) return@ListItem
+                                        if (isScanModeOnState.value) return@ListItem
 
-                                        Icon(
-                                            Icons.Filled.Delete,
-                                            contentDescription = "delete item",
-                                            modifier = Modifier.clickable {
-                                                sampleIds.removeAt(index)
-                                            }
-                                        )
+                                        IconButton(onClick = { sampleIds.removeAt(index) }) {
+                                            Icon(
+                                                Icons.Filled.Delete,
+                                                contentDescription = "delete item",
+                                                modifier = Modifier.fillMaxHeight()
+                                            )
+                                        }
+
                                     },
-                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                                    colors = ListItemDefaults.colors(
+                                        containerColor = if (conflictingSamples.contains(sampleId))
+                                            Color.Red.copy(alpha = 0.1f)
+                                        else Color.Transparent
+                                    )
                                 )
                                 HorizontalDivider()
-                                if (!isScanModeOn && index == sampleIds.size - 1) {
+                                if (!isScanModeOnState.value && index == sampleIds.size - 1) {
                                     ToggleableSampleInput(
-                                        isShow = isManualInput,
-                                        onToggle = {
-                                            isManualInput = !isManualInput
-                                        },
                                         onAdd = onAddManually,
                                         modifier = Modifier
-                                            .padding(end = 8.dp, bottom = 8.dp)
+                                            .padding(end = 8.dp)
+                                            .padding(bottom = 8.dp)
+                                            .padding(start = 8.dp)
                                     )
                                 }
                             }
@@ -188,7 +163,7 @@ fun SelectorBody(
                     }
                 }
             }
-            if (isScanModeOn) {
+            if (isScanModeOnState.value) {
                 ScanningIndicator()
             }
         }
@@ -225,21 +200,22 @@ fun SelectorBodyPreview() {
     SelectorBody(
         remember {
             mutableStateListOf<String>(
-//                "asg",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a",
-//                "a"
+                "asg",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a",
+                "a"
             )
         },
-        isScanModeOn = false
+        conflictingSamples = mutableListOf("asg"),
+        isScanModeOnState = mutableStateOf(false)
     )
 //    }
 }

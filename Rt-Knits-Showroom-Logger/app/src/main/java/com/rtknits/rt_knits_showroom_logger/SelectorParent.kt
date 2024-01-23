@@ -34,39 +34,47 @@ import com.rtknits.rt_knits_showroom_logger.components.rememberSaveableMutableSt
 import com.rtknits.rt_knits_showroom_logger.scanners.ScannerChooser
 import com.rtknits.rt_knits_showroom_logger.scanners.ScannerService
 
-enum class ActionOptions(
+data class ActionOptions(
     val title: String,
     var displayColor: Color = Color.Black,
-    var assocSamples: SnapshotStateList<String> = SnapshotStateList<String>()
-) {
-    ADD("Add to Showroom"),
-    REMOVE("Remove from Showroom")
-}
+    var assocSamples: SnapshotStateList<String> = SnapshotStateList(),
+    var conflictingSamples: SnapshotStateList<String> = SnapshotStateList(),
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectorParent() {
     val context = LocalContext.current
-    val scannerService by remember { mutableStateOf<ScannerService?>(ScannerChooser.getAttachedScanner()) }
 
-    var selectedTab by remember { mutableStateOf(ActionOptions.ADD) }
-    var tabState by remember { mutableStateOf(selectedTab.ordinal) }
     val addList = rememberSaveableMutableStateListOf<String>()
     val removeList = rememberSaveableMutableStateListOf<String>()
-    LaunchedEffect(Unit) {
-        ActionOptions.ADD.assocSamples = addList;
-        ActionOptions.ADD.displayColor = Color(ContextCompat.getColor(context, R.color.rt_blue))
-        ActionOptions.REMOVE.assocSamples = removeList;
-        ActionOptions.REMOVE.displayColor = Color(ContextCompat.getColor(context, R.color.rt_red))
+
+    val actions: List<ActionOptions> = remember {
+        listOf(
+            // any samples that are in the addList should NOT be in the removeList at the same time!
+            ActionOptions(
+                "Add to Showroom",
+                Color(ContextCompat.getColor(context, R.color.rt_blue)),
+                assocSamples = addList,
+                conflictingSamples = removeList
+            ),
+            ActionOptions(
+                "Remove from Showroom",
+                Color(ContextCompat.getColor(context, R.color.rt_red)),
+                assocSamples = removeList,
+                conflictingSamples = addList
+            )
+        )
     }
 
-    var isScanModeOn by remember { mutableStateOf(false) }
-
+    val scannerService by remember { mutableStateOf<ScannerService?>(ScannerChooser.getAttachedScanner()) }
+    var curTab by remember { mutableStateOf(0) }
+    val isScanModeOn = remember { mutableStateOf(false) }
     var isConfirmationDialogOpen by remember { mutableStateOf(false) }
 
-    LaunchedEffect(isScanModeOn) {
-        if (isScanModeOn) {
-            val listToPushTo = selectedTab.assocSamples;
+    LaunchedEffect(isScanModeOn.value) {
+        if (isScanModeOn.value) {
+            val listToPushTo = actions[curTab].assocSamples;
             scannerService?.startInventorying { epc ->
                 val detectedSampleId = epc.decodeHex().uppercase()
 
@@ -88,16 +96,14 @@ fun SelectorParent() {
         modifier = Modifier.fillMaxHeight(),
     ) {
         PrimaryTabRow(
-            selectedTabIndex = tabState,
+            selectedTabIndex = curTab,
         ) {
-
-            ActionOptions.entries.forEachIndexed { index, action ->
+            actions.forEachIndexed { index, action ->
                 Tab(
-                    enabled = !isScanModeOn,
-                    selected = tabState == index,
+                    enabled = !isScanModeOn.value,
+                    selected = curTab == index,
                     onClick = {
-                        tabState = index
-                        selectedTab = action
+                        curTab = index
                     },
                     text = {
                         Text(
@@ -105,7 +111,7 @@ fun SelectorParent() {
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             color =
-                            if (isScanModeOn && selectedTab != action) {
+                            if (isScanModeOn.value && actions[curTab] != action) {
                                 Color.Gray
                             } else {
                                 action.displayColor
@@ -122,11 +128,12 @@ fun SelectorParent() {
                 .padding(8.dp),
         ) {
             SelectorBody(
-                selectedTab.assocSamples,
-                borderStroke = BorderStroke(1.dp, selectedTab.displayColor),
+                sampleIds = actions[curTab].assocSamples,
+                conflictingSamples = actions[curTab].conflictingSamples,
+                borderStroke = BorderStroke(1.dp, actions[curTab].displayColor),
                 modifier = Modifier.weight(1f),
-                containerColor = selectedTab.displayColor.copy(alpha = 0.1f),
-                isScanModeOn = isScanModeOn
+                containerColor = actions[curTab].displayColor.copy(alpha = 0.1f),
+                isScanModeOnState = isScanModeOn
             )
         }
 
@@ -137,9 +144,9 @@ fun SelectorParent() {
                 .padding(bottom = 8.dp)
         ) {
 
-            if (isScanModeOn) {
+            if (isScanModeOn.value) {
                 OutlinedButton(
-                    onClick = { isScanModeOn = !isScanModeOn }, modifier = Modifier.weight(1f)
+                    onClick = { isScanModeOn.value = !isScanModeOn.value }, modifier = Modifier.weight(1f)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth()
@@ -151,9 +158,9 @@ fun SelectorParent() {
                 }
             } else {
                 FilledTonalButton(
-                    onClick = { isScanModeOn = !isScanModeOn },
+                    onClick = { isScanModeOn.value = !isScanModeOn.value },
                     modifier = Modifier.weight(1f),
-                    enabled = !isScanModeOn
+                    enabled = !isScanModeOn.value
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth()
@@ -163,7 +170,6 @@ fun SelectorParent() {
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-
                 }
             }
 

@@ -39,6 +39,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -68,27 +69,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
+import com.rtknits.rt_knits_samplefinder.components.SampleIdInput
 import com.rtknits.rt_knits_samplefinder.components.annotateSampleId
 import com.rtknits.rt_knits_samplefinder.ui.theme.RtknitsSampleFinderTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-val sampleIDTrailing = "SG"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
     val nc = NavControllerContext.current
 
-    var inputSampleId by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    var doTrailing by remember { mutableStateOf(true) }
-
     val onAddSample = remember {
-        {
+        { inputSampleId: String ->
             scope.launch {
                 // scroll to bottom of list of sampleids
                 listState.animateScrollToItem(sampleIds.size - 1)
@@ -99,16 +96,8 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
 
             // dont add if sample is already added
             if (sampleIds.find { s -> s.lowercase() == inputSampleId.lowercase() } == null) {
-                val sid = if (doTrailing)
-                    "$inputSampleId$sampleIDTrailing"
-                else
-                    inputSampleId
-
-                sampleIds.add(
-                    sid.uppercase()
-                )
+                sampleIds.add(inputSampleId)
             }
-            inputSampleId = ""
         }
     }
 
@@ -184,13 +173,13 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
                                 ListItem(
                                     headlineContent = { Text(annotateSampleId(sampleId)) },
                                     trailingContent = {
-                                        Icon(
-                                            Icons.Filled.Delete,
-                                            contentDescription = "delete item",
-                                            modifier = Modifier.clickable {
-                                                sampleIds.removeAt(index)
-                                            }
-                                        )
+                                        IconButton(onClick = { sampleIds.removeAt(index) }) {
+                                            Icon(
+                                                Icons.Filled.Delete,
+                                                contentDescription = "delete item",
+                                                modifier = Modifier.fillMaxHeight()
+                                            )
+                                        }
                                     },
                                 )
                                 HorizontalDivider()
@@ -200,89 +189,7 @@ fun SampleSelect(sheetState: SheetState, sampleIds: SnapshotStateList<String>) {
                 }
             }
         }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .requiredHeight(60.dp),
-        ) {
-            Box(Modifier.weight(1f)) {
-                Switch(
-                    checked = doTrailing,
-                    onCheckedChange = {
-                        inputSampleId = ""
-                        doTrailing = it
-
-                        if(doTrailing){
-                            Toast.makeText(context, "SG will be appended to your number", Toast.LENGTH_SHORT).show()
-                        }else{
-                            Toast.makeText(context, "Raw Text Mode", Toast.LENGTH_SHORT).show()
-
-                        }
-                    },
-                    thumbContent = if (doTrailing) {
-                        {
-                            Text(
-                                sampleIDTrailing,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    } else {
-                        null
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .offset(x = ((-10).dp), y = 4.dp)
-                        .zIndex(1f)
-                )
-
-
-                OutlinedTextField(
-                    value = inputSampleId,
-                    onValueChange = { inputSampleId = it },
-                    singleLine = true,
-                    label = { Text("SampleID") },
-                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = "search icon") },
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            if (inputSampleId != "") {
-                                onAddSample()
-                            }
-                        }),
-                    keyboardOptions = KeyboardOptions
-                        .Default
-                        .copy(
-                            keyboardType =
-                            if (doTrailing)
-                                KeyboardType.Number
-                            else
-                                KeyboardType.Password,
-
-                            ),
-                )
-            }
-            if (inputSampleId != "") {
-                Button(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .fillMaxHeight(),
-                    shape = RoundedCornerShape(size = 4.dp), // Adjust corner radius as needed
-                    colors = ButtonDefaults
-                        .buttonColors(
-                            containerColor =
-                            Color(ContextCompat.getColor(context, R.color.rt_blue))
-                        ),
-                    onClick = onAddSample
-                ) {
-                    Icon(Icons.Outlined.Add, contentDescription = "Localized description")
-                }
-            }
-        }
+        SampleIdInput(onAddSample)
     }
 }
 
@@ -295,8 +202,8 @@ fun SampleSelectorPreview() {
             rememberModalBottomSheetState(),
             remember {
                 mutableStateListOf<String>(
-//                    "asg",
-//                    "a",
+                    "asg",
+                    "a",
 //                    "a",
 //                    "a",
 //                    "a",

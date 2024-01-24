@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -146,7 +147,8 @@ fun SelectorParent() {
 
             if (isScanModeOn.value) {
                 OutlinedButton(
-                    onClick = { isScanModeOn.value = !isScanModeOn.value }, modifier = Modifier.weight(1f)
+                    onClick = { isScanModeOn.value = !isScanModeOn.value },
+                    modifier = Modifier.weight(1f)
                 ) {
                     Column(
                         modifier = Modifier.fillMaxWidth()
@@ -193,7 +195,7 @@ fun SelectorParent() {
 
     }
     if (isConfirmationDialogOpen) {
-        ConfirmationDialog(
+        CommitChangesDialog(
             onConfirmation = {},
             onDismissRequest = {
                 isConfirmationDialogOpen = false

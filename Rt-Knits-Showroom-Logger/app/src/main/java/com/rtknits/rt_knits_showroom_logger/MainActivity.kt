@@ -1,13 +1,16 @@
 package com.rtknits.rt_knits_showroom_logger
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.rtknits.rt_knits_showroom_logger.scanners.NoScannerDetected
 import com.rtknits.rt_knits_showroom_logger.scanners.ScannerChooser
 import com.rtknits.rt_knits_showroom_logger.components.Header
-import com.rtknits.rt_knits_showroom_logger.components.PermanentAlertDialog
 import com.rtknits.rt_knits_showroom_logger.scanners.ScannerService
 import com.rtknits.rt_knits_showroom_logger.ui.theme.RtKnitsShowroomLoggerTheme
 
@@ -37,6 +39,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Base() {
+
+    Log.d("jeff", BuildConfig.FM_user)
+    Log.d("jeff", BuildConfig.FM_pass)
+
     var scannerService by remember { mutableStateOf<ScannerService?>(null) }
     var openNoDeviceDialog by remember { mutableStateOf(false) }
     var openConnectingDialog by remember { mutableStateOf(false) }
@@ -72,28 +78,34 @@ fun Base() {
 
             when {
                 openNoDeviceDialog -> {
-                    PermanentAlertDialog(
+                    AlertDialog(
                         onDismissRequest = { },
-                        onConfirmation = { },
-                        dialogTitle = "No UHF Device Detected",
-                        dialogText = "Make sure this app is running on a Chainway UHF device.\n" +
-                                "Make sure electronics are turned on and charged.\n" +
-                                "Make sure no other apps are using the scanner.",
+                        confirmButton = { },
+                        title = { Text(text = "No UHF Device Detected") },
+                        text = {
+                            Text(
+                                text = "Make sure this app is running on a Chainway UHF device.\n" +
+                                        "Make sure electronics are turned on and charged.\n" +
+                                        "Make sure no other apps are using the scanner."
+                            )
+                        }
                     )
                 }
 
                 openConnectingDialog -> {
-                    PermanentAlertDialog(
+                    AlertDialog(
                         onDismissRequest = { },
-                        onConfirmation = { },
-                        dialogTitle = "Connecting...",
-                        dialogText = "",
+                        confirmButton = { },
+                        title = { Text(text = "Connecting...") },
+                        text = {
+                        }
                     )
                 }
             }
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun HomePreview() {

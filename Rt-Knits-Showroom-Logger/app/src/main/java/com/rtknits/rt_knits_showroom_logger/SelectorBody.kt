@@ -132,7 +132,7 @@ fun SelectorBody(
                                     trailingContent = {
                                         if (isScanModeOnState.value) return@ListItem
 
-                                        IconButton(onClick = { sampleIds.removeAt(index) }) {
+                                        IconButton(onClick = { sampleIds.removeAt(index) }, ) {
                                             Icon(
                                                 Icons.Filled.Delete,
                                                 contentDescription = "delete item",

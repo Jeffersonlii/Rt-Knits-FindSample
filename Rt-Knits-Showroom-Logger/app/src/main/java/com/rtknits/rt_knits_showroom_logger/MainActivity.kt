@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rtknits.rt_knits_showroom_logger.api.APIService
 import com.rtknits.rt_knits_showroom_logger.scanners.NoScannerDetected
 import com.rtknits.rt_knits_showroom_logger.scanners.ScannerChooser
 import com.rtknits.rt_knits_showroom_logger.components.Header
@@ -39,22 +40,30 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Base() {
-
-    Log.d("jeff", BuildConfig.FM_user)
-    Log.d("jeff", BuildConfig.FM_pass)
-
-    var scannerService by remember { mutableStateOf<ScannerService?>(null) }
     var openNoDeviceDialog by remember { mutableStateOf(false) }
     var openConnectingDialog by remember { mutableStateOf(false) }
+    var openNoDBDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    val scannerService by remember {
+        var ss: ScannerService? = null
+
         try {
-            scannerService = ScannerChooser.getAttachedScanner()
+            ss = ScannerChooser.getAttachedScanner()
         } catch (e: NoScannerDetected) {
             openNoDeviceDialog = true
         } finally {
             openConnectingDialog = false
         }
+
+        return@remember mutableStateOf(ss)
+    }
+    val api = remember { APIService(BuildConfig.FM_user, BuildConfig.FM_pass) }
+
+
+    LaunchedEffect(api.ready) {
+        if (!api.ready) return@LaunchedEffect
+
+        openNoDBDialog = !api.connected
     }
 
     Scaffold(
@@ -73,8 +82,6 @@ fun Base() {
             modifier = Modifier
                 .padding(innerPadding)
         ) {
-
-            SelectorParent()
 
             when {
                 openNoDeviceDialog -> {
@@ -100,6 +107,28 @@ fun Base() {
                         text = {
                         }
                     )
+                }
+
+                openNoDBDialog -> {
+                    AlertDialog(
+                        onDismissRequest = { },
+                        confirmButton = { },
+                        title = { Text(text = "FileMaker Connection Failed") },
+                        text = {
+                            Column {
+                                Text("Database : Marketing Store")
+                                Text("Username : ${BuildConfig.FM_user}")
+                                Text("Password : ${BuildConfig.FM_pass}\n")
+                                Text("Check with the ERP team to diagnose\n")
+                                Text("Make sure the account exists, passwords match and the user has fmrest extended privilege")
+                            }
+                        }
+                    )
+                }
+
+                else -> {
+                    // no problems? render the app!
+                    scannerService?.let { SelectorParent(it) }
                 }
             }
         }

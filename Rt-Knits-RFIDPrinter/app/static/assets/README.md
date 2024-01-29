@@ -2,17 +2,15 @@
 
 This python flask app allows for print of RFID Labels for Samples at RT Knits
 
-![image](https://github.com/Jeffersonlii/Rt-Knits-FindSample/assets/32963293/54881243-e29d-4710-9b84-e9be636d9ba3)
+# Source code
 
-# Download
-
-The app is available in `RFIDPrinter.tar.gz`
+https://github.com/Jeffersonlii/Rt-Knits-FindSample/tree/main/Rt-Knits-RFIDPrinter
 
 # Compatibility
 
 This application is compatible with the printers **Chainway CP30** and **Zebra ZD612R**
 
-This application is meant to be ran on **windows**
+This application is must be ran on **windows**
 
 # Exterior Requirements - Chainway
 
@@ -31,7 +29,7 @@ This application is meant to be ran on **windows**
 
 # Functionality
 
-This app is a flask service that services a easy to use web interface, as well as an API
+This app is a flask service that services a easy to use web interface, as well as an Web API
 
 ### Webapp
 
@@ -41,12 +39,21 @@ This app is a flask service that services a easy to use web interface, as well a
 - A RFID Label is then printed from the connected printer, with the RFID overridden as the input Sample ID
 - User can then attach the sticker onto the garment
 
-### Printing API
+### Printing API (Chainway Only)
 
-- Available at http://127.0.0.1:8003/RFIDprint/{SAMPLEID}?copies={COPIES}
+- Available at http://127.0.0.1:8003/RFIDprint/{SAMPLEID}?copies={COPIES} and http://127.0.0.1:8003/customerStickerPrint/{SAMPLEID}?copies={COPIES}
 - External Apps (ex. Filemaker) can use this endpoint to print RFID Labels
 
 **For development information, view `app/README.md`**
+
+# FileMaker Integration
+
+- FileMaker uses this service by making a web request to `http://127.0.0.1:8003/customerStickerPrint/{SAMPLEID}?copies={COPIES}` when printing a full customer sample sticker.
+- This endpoint prints the template found in `static/StickerTemplates/CustomerSampleSticker.prn`
+- The template is a raw zpl file, which can be generated via `static/StickerTemplates/CustomerSampleStickerDesign.nlbl`(open in Zebra Designer)
+- The Template file follows the following convention for variables
+  - the field `<SampleID>` in the nlbl file may be updated to value `12345SG` by including the following pair in the json body to this request
+  - `{... , "SampleID" : "12345SG", ...}`
 
 # Batch Scripts
 

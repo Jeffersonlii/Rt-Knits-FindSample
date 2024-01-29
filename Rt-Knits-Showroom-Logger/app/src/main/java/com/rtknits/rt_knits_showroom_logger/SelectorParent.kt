@@ -44,7 +44,7 @@ data class ActionOptions(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectorParent() {
+fun SelectorParent(scannerService: ScannerService) {
     val context = LocalContext.current
 
     val addList = rememberSaveableMutableStateListOf<String>()
@@ -67,8 +67,6 @@ fun SelectorParent() {
             )
         )
     }
-
-    val scannerService by remember { mutableStateOf<ScannerService?>(ScannerChooser.getAttachedScanner()) }
     var curTab by remember { mutableStateOf(0) }
     val isScanModeOn = remember { mutableStateOf(false) }
     var isConfirmationDialogOpen by remember { mutableStateOf(false) }
@@ -76,7 +74,7 @@ fun SelectorParent() {
     LaunchedEffect(isScanModeOn.value) {
         if (isScanModeOn.value) {
             val listToPushTo = actions[curTab].assocSamples;
-            scannerService?.startInventorying { epc ->
+            scannerService.startInventorying { epc ->
                 val detectedSampleId = epc.decodeHex().uppercase()
 
                 // if string has non alphanumerics, it is not a valid Sampleid (likely an unset new RFID tag)
@@ -89,7 +87,7 @@ fun SelectorParent() {
             };
 
         } else {
-            scannerService?.stopInventorying();
+            scannerService.stopInventorying();
         }
     }
 
@@ -210,7 +208,7 @@ fun SelectorParent() {
 @Composable
 fun SelectorParentPreview() {
 //    RtKnitsShowroomLoggerTheme {
-    SelectorParent()
+    SelectorParent(scannerService = ScannerChooser.getAttachedScanner())
 //    }
 }
 

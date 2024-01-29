@@ -76,3 +76,4 @@ class ChainwayScannerServiceImpl : ScannerService {
         connected = false;
     }
 }
+

@@ -59,6 +59,7 @@ android {
 }
 
 dependencies {
+    implementation("ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.*"))))
     implementation("androidx.core:core-ktx:1.12.0")

@@ -1,37 +1,6 @@
 <html>
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <head>
-    <script type="text/javascript">
-      function setup() {
-        document
-          .getElementById("rfidForm")
-          .addEventListener("submit", function (event) {
-            event.preventDefault();
-            var sampleId = document.getElementById("sampleId").value;
-            var qty = document.getElementById("quantity").value;
-            qty = qty === "" ? 1 : qty;
-            console.log(qty);
-
-            fetch(`RFIDprint/${sampleId}?copies=${qty}`, {
-              method: "post",
-            })
-              .then(async (resp) => {
-                const err = await resp.json();
-
-                if (err.chainway_status === "fail") {
-                  alert(err.chainway_error_code);
-                }
-              })
-              .catch(() => {
-                alert(
-                  "Unable to reach printer, try to restart the RFIDPrinterService.exe"
-                );
-              });
-          });
-      }
-      window.onload = setup;
-    </script>
-
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -65,38 +34,6 @@
         width: 90%;
         max-width: 40rem;
       }
-
-      #rfidForm {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      #rfidForm input,
-      #rfidForm button {
-        padding: 10px;
-        font-size: 16px;
-        width: 100%;
-      }
-      #rfidForm .bottom-bar {
-        display: flex;
-        gap: 1rem;
-      }
-      #rfidForm .bottom-bar input {
-        width: 9rem;
-      }
-
-      #rfidForm button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-
-      #rfidForm button:hover {
-        background-color: #0056b3;
-      }
-
       details {
         margin-top: 20px;
       }
@@ -110,37 +47,21 @@
         alt="Logo"
       />
       <h1>Sample Garment RFID Printer</h1>
-      <div style="flex-grow: 1"></div>
-      <a href="./zebra"> To Zebra → </a>
-      <a
-        href="{{url_for('static', filename='assets/README.md')}}"
-        target="_blank"
-      >
-        Info
-      </a>
     </header>
     <section>
-      <form id="rfidForm">
-        <label>
-          <div class="label">
-            <span class="label-text">Insert Sample Id of Garment</span>
-          </div>
-          <input type="text" placeholder="Sample id" id="sampleId" />
-        </label>
-
-        <div class="bottom-bar">
-          <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            placeholder="Quantity"
-            min="1"
-          />
-          <button id="submitBtn" type="submit">
-            Print Chainway RFID Label
-          </button>
-        </div>
-      </form>
+      <p>The Printer Service is up and running!</p>
+      <p>You may likely find the shortcut of the program in</p>
+      <code>
+        <b> C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup </b>
+      </code>
+      <p>
+        <a
+          href="{{url_for('static', filename='assets/README.md')}}"
+          target="_blank"
+        >
+          Documentation
+        </a>
+      </p>
 
       <details>
         <summary>Troubleshooting</summary>

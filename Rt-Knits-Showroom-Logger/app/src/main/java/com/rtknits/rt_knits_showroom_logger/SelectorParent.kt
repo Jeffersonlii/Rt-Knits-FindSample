@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -18,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,6 +31,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.rtknits.rt_knits_showroom_logger.api.Operation
+import com.rtknits.rt_knits_showroom_logger.api.SampleInfo
+import com.rtknits.rt_knits_showroom_logger.components.CommitChangesDialog
+import com.rtknits.rt_knits_showroom_logger.components.FailedSanitizationDialog
 import com.rtknits.rt_knits_showroom_logger.components.decodeHex
 import com.rtknits.rt_knits_showroom_logger.components.rememberSaveableMutableStateListOf
 import com.rtknits.rt_knits_showroom_logger.scanners.ScannerChooser
@@ -46,9 +51,11 @@ data class ActionOptions(
 @Composable
 fun SelectorParent(scannerService: ScannerService) {
     val context = LocalContext.current
-
+    val api = APIProvider.current
     val addList = rememberSaveableMutableStateListOf<String>()
     val removeList = rememberSaveableMutableStateListOf<String>()
+    val sampleInfoMap = remember { mutableStateMapOf<String, SampleInfo?>() }
+    val previousSampleOperationMap = remember { mutableStateMapOf<String, Operation?>() }
 
     val actions: List<ActionOptions> = remember {
         listOf(
@@ -70,6 +77,11 @@ fun SelectorParent(scannerService: ScannerService) {
     var curTab by remember { mutableStateOf(0) }
     val isScanModeOn = remember { mutableStateOf(false) }
     var isConfirmationDialogOpen by remember { mutableStateOf(false) }
+    var isErrorDialogOpen by remember { mutableStateOf(false) }
+
+    var conflictingSamples by remember { mutableStateOf(listOf<String>()) }
+    var nonExistentSamples by remember { mutableStateOf(listOf<String>()) }
+    var invalidOperationsSamples by remember { mutableStateOf(listOf<String>()) }
 
     LaunchedEffect(isScanModeOn.value) {
         if (isScanModeOn.value) {
@@ -84,6 +96,18 @@ fun SelectorParent(scannerService: ScannerService) {
                 if (listToPushTo.contains(detectedSampleId)) return@startInventorying;
 
                 listToPushTo.add(detectedSampleId)
+                if (!sampleInfoMap.containsKey(detectedSampleId)) {
+                    api.getSampleInformation(detectedSampleId) {
+                        if (it.success) {
+                            sampleInfoMap[detectedSampleId] = it.sampleInfo
+                        }
+                    }
+                }
+                if (!previousSampleOperationMap.containsKey(detectedSampleId)) {
+                    api.getSamplePreviousOperation(detectedSampleId) {
+                        previousSampleOperationMap[detectedSampleId] = it
+                    }
+                }
             };
 
         } else {
@@ -132,7 +156,8 @@ fun SelectorParent(scannerService: ScannerService) {
                 borderStroke = BorderStroke(1.dp, actions[curTab].displayColor),
                 modifier = Modifier.weight(1f),
                 containerColor = actions[curTab].displayColor.copy(alpha = 0.1f),
-                isScanModeOnState = isScanModeOn
+                isScanModeOnState = isScanModeOn,
+                sampleInfoMap = sampleInfoMap
             )
         }
 
@@ -173,34 +198,71 @@ fun SelectorParent(scannerService: ScannerService) {
                 }
             }
 
-            Button(
-                onClick = {
-                    isConfirmationDialogOpen = true;
-                },
-                modifier = Modifier.weight(1f)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        "Commit Changes", modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                }
+            if (!isScanModeOn.value) {
+                Button(
+                    enabled = addList.isNotEmpty() || removeList.isNotEmpty(),
+                    onClick = {
+                        conflictingSamples = addList.filter { it in removeList }
+                        nonExistentSamples = (
+                                addList.filter { !sampleInfoMap.containsKey(it) || sampleInfoMap[it] == null } +
+                                        removeList.filter { !sampleInfoMap.containsKey(it) || sampleInfoMap[it] == null }
+                                ).distinct()
+                        invalidOperationsSamples = (addList.filter {
+                            previousSampleOperationMap.containsKey(it) && previousSampleOperationMap[it] == Operation.ADDITION
+                        } + removeList.filter {
+                            previousSampleOperationMap.containsKey(it) && previousSampleOperationMap[it] == Operation.REMOVAL
+                        }).distinct()
 
+                        if (conflictingSamples.isNotEmpty() ||
+                            nonExistentSamples.isNotEmpty() ||
+                            invalidOperationsSamples.isNotEmpty()
+                        ) {
+                            isErrorDialogOpen = true
+                        } else {
+                            isConfirmationDialogOpen = true;
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            "Commit Changes",
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                }
             }
         }
-
-
     }
-    if (isConfirmationDialogOpen) {
-        CommitChangesDialog(
-            onConfirmation = {},
-            onDismissRequest = {
-                isConfirmationDialogOpen = false
-            },
-            adds = addList,
-            removes = removeList
-        )
+    when {
+        isConfirmationDialogOpen -> {
+            CommitChangesDialog(
+                onConfirmation = {
+                    addList.clear()
+                    removeList.clear()
+                    previousSampleOperationMap.clear()
+                    isConfirmationDialogOpen = false
+                },
+                onDismissRequest = {
+                    isConfirmationDialogOpen = false
+                },
+                adds = addList,
+                removes = removeList
+            )
+        }
+
+        isErrorDialogOpen -> {
+            FailedSanitizationDialog(
+                onDismissRequest = { isErrorDialogOpen = false },
+                conflictingSamples = conflictingSamples,
+                nonExistentSamples = nonExistentSamples,
+                invalidOperationSamples = invalidOperationsSamples
+            )
+        }
+
     }
 }
 
@@ -208,7 +270,9 @@ fun SelectorParent(scannerService: ScannerService) {
 @Composable
 fun SelectorParentPreview() {
 //    RtKnitsShowroomLoggerTheme {
-    SelectorParent(scannerService = ScannerChooser.getAttachedScanner())
+    SelectorParent(
+        scannerService = ScannerChooser.getAttachedScanner()
+    )
 //    }
 }
 

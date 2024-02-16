@@ -20,14 +20,19 @@ class ZebraPrinterService:
             return err_msg("connect")
         if(printerInfoResp.status_code == 200):
             self.__printerInfo = printerInfoResp.json()
+            print(self.__printerInfo)
+        else:
+            return err_msg("connect")
     def writeZPL(self, zpl:str):
         try:
-            requests.post(url = f"{self.__printerURL}/write",
+            writeResp = requests.post(url = f"{self.__printerURL}/write",
                       json = {
                                 'device': self.__printerInfo,
                                 'data': zpl,
                                 })
         except:
+            return err_msg("WriteZPL")
+        if(writeResp.status_code != 200):
             return err_msg("WriteZPL")
     def isConnected(self):
         return self.__printerInfo is not None

@@ -47,7 +47,7 @@ data class DataResponse(
 )
 
 // An connection to the marketing store database
-// make sure the input user has FMRest enabled!
+// make sure the inpu`t user has FMRest enabled!
 class APIService(private val username: String, private val password: String) {
     var connected = false;
     var ready = false;

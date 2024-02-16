@@ -58,6 +58,20 @@ The body of the request must be a JSON object following the following convention
    ```
 2. no word/sentence wrapping functionality
 
+# SImple Label
+
+### [GET] http://127.0.0.1:8003/simpleRFIDPrint/{SAMPLEID}?copies={COPIES}
+
+This app also support printing simple labels, with a simple design with only the `SampleID`.
+
+A webpage at http://127.0.0.1:8003/print provides a simple interface to print this sticker.
+
+Also, http://127.0.0.1:8003/printFromBarcode provides a quick method print stickers for prexisting samples.
+It accepts the `Item Ref` of the sample, which is written on the `barcode` of the pre-existing sample sticker.
+
+The mapping from `Item Ref` to `SampleID` is stored in memory as a dictionary, and the data is loaded in from `/static/mapping.xlsx`.
+This method of printing is primarily to accomodate printing of the pre-existing samples. As time passes, this method would not be used as RFID stickers should be printed at the time of sample creation.
+
 # Helpful Batch Scripts
 
 This application comes with 3 windows batch scripts to help with development

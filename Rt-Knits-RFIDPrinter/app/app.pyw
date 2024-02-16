@@ -6,13 +6,14 @@
 # ----------------------------------------------------------------------
 
 import subprocess
+from typing import List
 from flask import Flask, jsonify, render_template, request
 from services.cw_print_service import CWPrinterService
-from services.sticker_service import generateZPL
+from services.sticker_service import generateCustomerZPL, generateSimpleZPL
 from services.zebra_print_service import ZebraPrinterService
 from util import getAppPath, isRunningAsExecutable
 import sys, os
-
+import pylightxl as xl
 
 isRunningAsExecutable = isRunningAsExecutable()
 app_path = getAppPath()
@@ -33,7 +34,39 @@ z_ps = ZebraPrinterService()
 @app.route('/')
 def home():
     return render_template('index.html')
+@app.route('/print')
+def print_simple():
+    return render_template('print.html')
+@app.route('/printFromBarcode')
+def printFromBarcode():
+    return render_template('printFromBarcode.html')
+
 # ------------ Printer ENDPOINTS -----------------
+
+@app.route('/simpleRFIDPrint/<epcString>', methods=['POST'])
+def simple_RFID_print(epcString: str):
+    copies = request.args.get('copies', default = 1, type = int)
+    header = request.args.get('header', default = "", type = str)
+    zpl = generateSimpleZPL(epcString, header, copies=copies)
+
+    writeResult = connectAndWrite(zpl)
+    return jsonify(writeResult), 200 if writeResult["print_attempt_status"] else 500
+
+ref_to_sid_mapping = None
+@app.route('/getSampleIDFromItemRef/<itemref>', methods=['GET'])
+def getSampleIDFromItemRef(itemref: str):
+    global ref_to_sid_mapping
+    if(ref_to_sid_mapping is None):
+        db = xl.readxl(os.path.join(app_path, 'static','mapping.xlsx'))
+        # Get the data from the first sheet
+        sheet = db.ws(db.ws_names[0])
+
+        item_sample_ids: List[str] = sheet.col(col=1)
+        item_refs: List[str] = sheet.col(col=2)
+
+        ref_to_sid_mapping = {item_refs[i].upper():item_sample_ids[i].upper() for i in range(0, len(item_sample_ids))}
+
+    return jsonify({"sampleID": ref_to_sid_mapping.get(itemref.upper(), "")}), 200
 
 # Prints a Customer Sample Sticker. 
 # The template of the sticker is found at `static/StickerTemplates/CustomerSampleSticker.prn`
@@ -43,40 +76,35 @@ def home():
 #   {... , "SampleID" : "12345SG"}
 @app.route('/customerStickerPrint/<sampleid>', methods=['POST'])
 def customer_sticker_print(sampleid: str):
-    copies = request.args.get('copies', default = 1, type = int)
+    copies = max(1, request.args.get('copies', default=1, type=int))
+
     customer_sticker_data = request.get_json()
-    zpl = generateZPL(sampleid, customer_sticker_data, copies=copies)
+    zpl = generateCustomerZPL(sampleid, customer_sticker_data, copies=copies)
+    writeResult = connectAndWrite(zpl)
+    return jsonify(writeResult), 200 if writeResult["print_attempt_status"] else 500
 
-    # validate input
-    try:
-        if(not int(copies) > 0):
-            copies = 1
-    except:
-        copies = 1
 
+def connectAndWrite(zpl:str):
     # try to connect to both printers
     cw_connect_err = cw_ps.connect()
     z_connect_err = z_ps.connect()
 
-    cw_write_err, z_write_err  = None, None
-    print(cw_connect_err)
+    cw_write_err, z_write_err = None, None
+
     if(cw_ps.isConnected()):
         # try chainway printer
         cw_write_err = cw_ps.writeZPL(zpl)
-        pass
     if(z_ps.isConnected()):
         # try zebra printer
         z_write_err = z_ps.writeZPL(zpl)
-        pass
-    # print is successful if a connection was made and a print succeeded
-    is_print_successful = ((not cw_connect_err) or (not z_connect_err)) and  ((not cw_write_err) or (not z_write_err))
 
-    resp = {
+    # print is successful if a connection was made and a print succeeded
+    is_print_successful = (not cw_connect_err and not cw_write_err) or (not z_connect_err and not z_write_err) 
+
+    return {
         "print_attempt_status": is_print_successful,
         "errors" : [] if is_print_successful else [x for x in [cw_connect_err,z_connect_err,cw_write_err,z_write_err] if x is not None]
     }
-    print(resp)
-    return jsonify(resp)
 
 # ------------ main -----------------
 if __name__ == '__main__':

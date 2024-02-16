@@ -11,7 +11,7 @@ CUSTOMER_SAMPLE_STICKER_TEMPLATE = Path(zpl_template_path).read_text()
 # This function modifies the ZPL template to include user variables. 
 # By convention, the field <SampleID> template may be updated to value "12345SG" by including the following pair in the DATA Dict
 #     [...,  "SampleID": "12345SG" ...]
-def generateZPL(sampleid: str, data: Dict[str, str], copies = 1):
+def generateCustomerZPL(sampleid: str, data: Dict[str, str], copies = 1):
     interpolated_zpl = CUSTOMER_SAMPLE_STICKER_TEMPLATE
 
     # remove zpl printer settings (we will use the printer's settings)
@@ -56,3 +56,18 @@ def generateZPL(sampleid: str, data: Dict[str, str], copies = 1):
     #                         1)
 
     return interpolated_zpl
+
+# Returns a simple RFID label, with epcData encoded in label
+def generateSimpleZPL(epcData: str, header: str, copies = 1):
+    return f"""
+     ^XA
+            ^PQ{copies},{copies},0,Y
+            ^RS8
+            ^RFW,A,,,A^FD{epcData.lower()}^FS
+            ^FT79,150^A0N,50,51^FH\^CI28^FD{header} :^FS^CI27
+            ^FT0,380^A0N,58,58^FB703,1,15,C^FH\^CI28^FD{epcData}^FS^CI27
+            ^FO74,322^GB555,83,4^FS
+            ^FT419,310^BQN,2,10
+            ^FH\^FDLA,{epcData}^FS
+        ^XZ
+    """

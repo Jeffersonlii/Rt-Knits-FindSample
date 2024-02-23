@@ -9,7 +9,7 @@
 
         var header = document.getElementById("header").value;
         var epcData = document.getElementById("epcData").value;
-
+        document.getElementById("epcData").value = "";
         let resp = await fetch(`getSampleIDFromItemRef/${epcData}`, {
           method: "get",
         });
@@ -57,6 +57,13 @@
           }
         });
       }
+
+      // auto focus on enter key
+      window.addEventListener("keydown", (event) => {
+        if (!document.activeElement.matches("input, textarea")) {
+          document.getElementById("epcData").focus();
+        }
+      });
       window.onload = setup;
     </script>
 

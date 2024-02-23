@@ -1,9 +1,9 @@
 # SampleFindr
 
-This Android application allows users to utilize the RFID scanner on their devices to scan for the location of RFID tag. This app is made to be ran on a [ Chainway C5 UHF RFID Reader](https://www.chainway.net/Products/Info/142) OR
-[Sunmi UHF Reader](https://www.sunmi.com/en-US/l2k/)
+This Android application allows users to utilize the RFID scanner on their devices to scan for the location of RFID tag. This app is made to be ran on a [ Chainway C5 UHF RFID Reader](https://www.chainway.net/Products/Info/142)
 
 # Download
+
 The App can be downloaded by using the APK provided in `releases`
 
 # Features
@@ -19,6 +19,7 @@ The App can be downloaded by using the APK provided in `releases`
 - Open Project in Android studio
   - Use Gradle JDK 17 (This project uses Gradle version `gradle-8.2`)
 - Build and Run on emulator or device
+- NOTE !!! If building on the `RTK` network, dependency installation will be blocked. The quickest solution is to install the dependencies on the `RT_Guest` network
 
 # Usage
 

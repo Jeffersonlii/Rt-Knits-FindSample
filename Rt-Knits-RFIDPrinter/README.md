@@ -14,13 +14,14 @@ This python flask app allows for print of RFID Labels for Samples at RT Knits
 
 # Compatibility
 
-This application is compatible with the printers **Chainway CP30**
+This application is compatible with the printers **Chainway CP30** and **Zebra ZD621R**
 
 This application is meant to be ran on **windows**
 
 ## Exterior Requirements
 
-1. Please download and install the [Drivers](https://www.chainway.net/Support/Info/30) of the printer
+1. Chainway [Drivers](https://www.chainway.net/Support/Info/30)
+2. Zebra [Browser Print Service](https://www.zebra.com/us/en/support-downloads/printer-software/by-request-software.html) and [Drivers](https://www.zebra.com/us/en/support-downloads/printers/desktop/zd621.html)
 
 # Functionality
 
